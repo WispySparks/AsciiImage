@@ -1,0 +1,5 @@
+# ignore unneeded folders and jar setup
+.vscode
+bin
+*Bundle/
+JarScript.jar

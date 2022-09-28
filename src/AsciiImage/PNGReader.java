@@ -72,11 +72,11 @@ public class PNGReader {
         String type = "";
         for (int i = 0; i < 4; i ++) {
             int charVal = bytes[i];
-            type += Ascii.decimalToAscii(charVal);
+            type += AsciiTable.decimalToAscii(charVal);
             System.out.println(charVal);
         }
-        System.out.println(type);
-        System.out.println(length);
+        System.out.println("Type: " + type);
+        System.out.println("Length: " + length);
     }
 
 }

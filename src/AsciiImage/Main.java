@@ -10,13 +10,13 @@ public class Main {
         File file = new File("C:\\Users\\wispy\\Downloads\\celeste.png");
         PNGReader reader = new PNGReader(file);
         reader.read();
-        System.out.println("Width: " + reader.width);
-        System.out.println("Height: " + reader.height);
-        System.out.println("Bit Depth: " + reader.bitDepth);
-        System.out.println("Color Type: " + reader.colorType);
-        System.out.println("Compression Method: " + reader.compression);
-        System.out.println("Filter Method: " + reader.filter);
-        System.out.println("Interlace Method: " + reader.interlace);
+        // System.out.println("Width: " + reader.width);
+        // System.out.println("Height: " + reader.height);
+        // System.out.println("Bit Depth: " + reader.bitDepth);
+        // System.out.println("Color Type: " + reader.colorType);
+        // System.out.println("Compression Method: " + reader.compression);
+        // System.out.println("Filter Method: " + reader.filter);
+        // System.out.println("Interlace Method: " + reader.interlace);
         scanner.close();
     }
 }

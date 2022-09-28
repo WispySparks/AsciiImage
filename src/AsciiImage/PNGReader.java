@@ -8,6 +8,7 @@ import javax.imageio.stream.FileImageInputStream;
 public class PNGReader {
 
     private File pngFile = null;
+    private boolean finished = false;
     public int width = 0; // Width of image in pixels
     public int height = 0; // Height of image in pixels
     public int bitDepth = 0; // Valid values are 1, 2, 4, 8, and 16
@@ -16,11 +17,12 @@ public class PNGReader {
     public int filter = 0; // Valid values are 0
     public int interlace = 0; // Valid values are 0 or 1
 
-    PNGReader(File file) {
-        pngFile = file;
+    public PNGReader(File f) {
+        pngFile = f;
     }
 
-    public void read() {
+    public void read() { //todo write check crc and use it on image header and other chunks
+        finished = false;
         try {
             FileImageInputStream stream = new FileImageInputStream(pngFile);
             if (!checkValidPNG(stream)) {
@@ -28,9 +30,12 @@ public class PNGReader {
                 return;
             }
             readImageHeader(stream);
-            readChunk(stream);
-            // readPLTE(stream);
-        } catch (Exception e) {
+            for (int i = 0; i < 100; i++) {
+                if (finished) break;
+                readChunk(stream);
+            }
+            stream.close();
+        } catch (IOException e) {
             System.out.println(e);
         }
         
@@ -48,8 +53,21 @@ public class PNGReader {
         return true;
     }
 
+    @SuppressWarnings("unused")
+    private void checkCRC(FileImageInputStream stream) throws IOException {
+        throw new IOException("CRC Mismatch");
+    }
+
     private void readImageHeader(FileImageInputStream stream) throws IOException {
-        stream.skipBytes(8); // skip chunk length and type
+        if (stream.readInt() != 13) throw new IOException("Header chunk corrupted");
+        byte[] bytes = new byte[4];
+        stream.readFully(bytes);
+        String type = "";
+        for (int i = 0; i < 4; i ++) {
+            int charVal = bytes[i];
+            type += AsciiTable.decimalToAscii(charVal);
+        }
+        if (!type.equals("IHDR")) throw new IOException("Header chunk missing");
         width = stream.readInt();
         height = stream.readInt();
         bitDepth = stream.readByte();
@@ -60,11 +78,6 @@ public class PNGReader {
         stream.skipBytes(4); // skip crc
     }
 
-    @SuppressWarnings("unused")
-    private void readPLTE(FileImageInputStream stream) throws IOException {
-
-    }
-
     private void readChunk(FileImageInputStream stream) throws IOException {
         int length = stream.readInt();
         byte[] bytes = new byte[4];
@@ -73,10 +86,13 @@ public class PNGReader {
         for (int i = 0; i < 4; i ++) {
             int charVal = bytes[i];
             type += AsciiTable.decimalToAscii(charVal);
-            System.out.println(charVal);
         }
         System.out.println("Type: " + type);
         System.out.println("Length: " + length);
+        stream.skipBytes(length + 4);
+        if (type.equals("IEND")) {
+            finished = true;
+        }
     }
 
 }

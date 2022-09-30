@@ -2,13 +2,16 @@ package AsciiImage;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 
 import javax.imageio.stream.FileImageInputStream;
 
+@SuppressWarnings("unused")
 public class PNGReader {
 
     private File pngFile = null;
     private boolean finished = false;
+    private int temp;
     public int width = 0; // Width of image in pixels
     public int height = 0; // Height of image in pixels
     public int bitDepth = 0; // Valid values are 1, 2, 4, 8, and 16
@@ -30,10 +33,10 @@ public class PNGReader {
                 return;
             }
             readImageHeader(stream);
-            for (int i = 0; i < 100; i++) {
-                if (finished) break;
-                readChunk(stream);
-            }
+            // for (int i = 0; i < 100; i++) {
+            //     if (finished) break;
+            //     readChunk(stream);
+            // }
             stream.close();
         } catch (IOException e) {
             System.out.println(e);
@@ -53,32 +56,47 @@ public class PNGReader {
         return true;
     }
 
-    @SuppressWarnings("unused")
-    private void checkCRC(FileImageInputStream stream) throws IOException {
-        throw new IOException("CRC Mismatch");
+    private static long computeCRC32(byte[] data) throws IOException {
+        final long polynomial = 0x104C11DB7L; // 32 bit crc generator polynomial (divisor)
+        long crc = 0;
+        crc ^= polynomial;
+        System.out.println(crc);
+        return crc;
     }
 
     private void readImageHeader(FileImageInputStream stream) throws IOException {
         if (stream.readInt() != 13) throw new IOException("Header chunk corrupted");
-        byte[] bytes = new byte[4];
-        stream.readFully(bytes);
+        byte[] tBytes = new byte[4];
+        stream.readFully(tBytes);
         String type = "";
         for (int i = 0; i < 4; i ++) {
-            int charVal = bytes[i];
+            int charVal = tBytes[i];
             type += AsciiTable.decimalToAscii(charVal);
         }
         if (!type.equals("IHDR")) throw new IOException("Header chunk missing");
-        width = stream.readInt();
-        height = stream.readInt();
-        bitDepth = stream.readByte();
-        colorType = stream.readByte();
-        compression = stream.readByte();
-        filter = stream.readByte();
-        interlace = stream.readByte();
-        stream.skipBytes(4); // skip crc
+        byte[] data = new byte[13];
+        stream.readFully(data);
+        byte[] bWidth = new byte[4];
+        byte[] bHeight = new byte[4];
+        for (int i = 0; i < 4; i ++) {
+            bWidth[i] = data[i];
+            bHeight[i] = data[i+4];
+        }
+        width = new BigInteger(bWidth).intValue();
+        height = new BigInteger(bHeight).intValue();
+        bitDepth = data[8]; 
+        colorType = data[9];
+        compression = data[10];
+        filter = data[11];
+        interlace = data[12];
+        int crc = stream.readInt();
+        System.out.println("Real CRC: " + crc);
+        if (computeCRC32(data) != crc); {
+            throw new IOException("CRC Mismatch");
+        }
     }
 
-    private void readChunk(FileImageInputStream stream) throws IOException {
+    private void readChunk(FileImageInputStream stream) throws IOException { // read all data chunks and concatenate it into one big chunk of data
         int length = stream.readInt();
         byte[] bytes = new byte[4];
         stream.readFully(bytes);

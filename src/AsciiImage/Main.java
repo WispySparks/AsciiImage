@@ -9,7 +9,7 @@ public class Main {
         // File file = new File(scanner.nextLine());
         File file = new File("C:\\Users\\wispy\\Downloads\\celeste.png");
         PNGReader reader = new PNGReader(file);
-        reader.read();
+        reader.readPNG();
         // System.out.println("Width: " + reader.width);
         // System.out.println("Height: " + reader.height);
         // System.out.println("Bit Depth: " + reader.bitDepth);

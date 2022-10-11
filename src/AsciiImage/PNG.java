@@ -12,6 +12,7 @@ public record PNG (
     int filter, // Valid values are 0
     int interlace, // Valid values are 0 or 1
     int gamma,
-    List<Integer> chromaticities
-
+    List<Integer> chromaticities,
+    List<Integer> backgroundColor
+    
 ) {}

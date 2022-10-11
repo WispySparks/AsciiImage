@@ -9,9 +9,10 @@ import java.util.List;
 
 import javax.imageio.stream.FileImageInputStream;
 
-// @SuppressWarnings("unused")
+@SuppressWarnings("unused")
 public class PNGReader {
 
+    private PNGUtil util = new PNGUtil();
     private boolean finished = false;
     private int width = -1; // Width of image in pixels
     private int height = -1; // Height of image in pixels
@@ -20,9 +21,9 @@ public class PNGReader {
     private int compression = -1; // Valid values are 0
     private int filter = -1; // Valid values are 0
     private int interlace = -1; // Valid values are 0 or 1
-    private int gamma = -1;
-    private List<Integer> chromaticities = new ArrayList<>();
-    private List<Integer> backgroundColor = new ArrayList<>();
+    private int gamma = -1; // gAMA
+    private List<Integer> chromaticities = new ArrayList<>(); // cHRM
+    private List<Integer> backgroundColor = new ArrayList<>(); // bKGD
 
     public PNG readPNG(File pngFile) { //todo write check crc and use it on image header and other chunks
         finished = false;
@@ -40,7 +41,7 @@ public class PNGReader {
             System.out.println(e);
         }
         return new PNG(width, height, bitDepth, colorType, compression, 
-        filter, interlace, gamma, chromaticities);
+        filter, interlace, gamma, chromaticities, backgroundColor);
     }
 
     private void readNextChunk(FileImageInputStream stream) throws IOException { // read all data chunks and concatenate it into one big chunk of data
@@ -53,37 +54,37 @@ public class PNGReader {
             type += AsciiTable.decimalToAscii(charVal);
         }
         switch (type) {
-            case "cHRM": readcHRM(length, stream); break;
-            case "gAMA": readgAMA(length, stream); break;
-            case "iCCP": break;
-            case "sBIT": break;
-            case "sRGB": break;
-            case "PLTE": break; // Critical, Optional
-            case "bKGD": readbKGD(length, stream); break;
-            case "hIST": break;
-            case "tRNS": break;
-            case "pHYs": break;
-            case "sPLT": break;
-            case "tIME": break;
-            case "iTXt": break;
-            case "tEXt": break;
-            case "zTXt": break;
-            case "IDAT": readIDAT(length, stream); break; // Critical
-            case "IEND": readIEND(length, stream); break; // Critical
-            default: stream.skipBytes(length); break;
+            case "cHRM" -> readcHRM(length, stream); 
+            case "gAMA" -> readgAMA(length, stream); 
+            // case "iCCP" -> 
+            // case "sBIT" -> 
+            // case "sRGB" -> 
+            // case "PLTE" ->  // Critical, Optional
+            case "bKGD" -> readbKGD(length, stream); 
+            // case "hIST" -> 
+            // case "tRNS" -> 
+            case "pHYs" -> readpHYs(length, stream); 
+            // case "sPLT" -> 
+            // case "tIME" -> 
+            // case "iTXt" -> 
+            // case "tEXt" -> 
+            // case "zTXt" -> 
+            case "IDAT" -> readIDAT(length, stream);  // Critical
+            case "IEND" -> readIEND(length, stream);  // Critical
+            default -> stream.skipBytes(length); 
         }
         stream.skipBytes(4); // crc
     }
 
     private boolean readPNGSignature(FileImageInputStream stream) throws IOException {
-        if (stream.readByte() != -119) return false;
-        if (stream.readByte() != 80) return false;
-        if (stream.readByte() != 78) return false;
-        if (stream.readByte() != 71) return false;
-        if (stream.readByte() != 13) return false;
-        if (stream.readByte() != 10) return false;
-        if (stream.readByte() != 26) return false;
-        if (stream.readByte() != 10) return false;
+        if (stream.read() != 137) return false;
+        if (stream.read() != 80) return false;
+        if (stream.read() != 78) return false;
+        if (stream.read() != 71) return false;
+        if (stream.read() != 13) return false;
+        if (stream.read() != 10) return false;
+        if (stream.read() != 26) return false;
+        if (stream.read() != 10) return false;
         return true;
     }
 
@@ -140,21 +141,23 @@ public class PNGReader {
     }
 
     private void readbKGD(int length, FileImageInputStream stream) throws IOException {
-        System.out.println(length);
         switch (colorType) {
             case 3 -> backgroundColor.add(stream.read()); 
-            case 0, 4 -> backgroundColor.add((stream.readByte() & 0xff) << 8 | (stream.readByte() & 0xff));  
-            // case 2, 6 -> backgroundColor.addAll(Arrays.asList(stream.read(),stream.read()));
+            case 0, 4 -> backgroundColor.add(util.combine2Bytes(stream.readByte(), stream.readByte()));  
+            case 2, 6 -> {
+                int r = util.combine2Bytes(stream.readByte(), stream.readByte()); 
+                int g = util.combine2Bytes(stream.readByte(), stream.readByte());
+                int b = util.combine2Bytes(stream.readByte(), stream.readByte());
+                backgroundColor.addAll(Arrays.asList(r, g, b));
+            }
         }
     }
 
-    public static long computeCRC32(byte[] data) throws IOException {
-        final long polynomial = 0x104C11DB7L; // 32 bit crc generator polynomial (divisor)
-        long crc = 0;
-        crc ^= polynomial;
-        System.out.println(crc);
-        return crc;
+    private void readpHYs(int length, FileImageInputStream stream) throws IOException {
+        int pixelsPerUnitX = stream.readInt();
+        int pixelsPerUnitY = stream.readInt();
+        int unitSpecifer = stream.read();
     }
 
-    // bKGD, pHYs, tIME, IDAT, tEXt
+    // tIME, IDAT, tEXt
 }

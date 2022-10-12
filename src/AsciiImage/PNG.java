@@ -13,6 +13,7 @@ public record PNG (
     int interlace, // Valid values are 0 or 1
     int gamma,
     List<Integer> chromaticities,
-    List<Integer> backgroundColor
-    
+    List<Integer> backgroundColor,
+    byte[] imageData // uncompressed
+
 ) {}

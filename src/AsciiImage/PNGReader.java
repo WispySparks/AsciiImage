@@ -24,6 +24,8 @@ public class PNGReader {
     private int gamma = -1; // gAMA
     private List<Integer> chromaticities = new ArrayList<>(); // cHRM
     private List<Integer> backgroundColor = new ArrayList<>(); // bKGD
+    private List<Integer> pixelDimensions = new ArrayList<>(); // pHYs
+    private List<Byte> imageData = new ArrayList<>(); // IDAT
 
     public PNG readPNG(File pngFile) { //todo write check crc and use it on image header and other chunks
         finished = false;
@@ -40,8 +42,13 @@ public class PNGReader {
         } catch (IOException e) {
             System.out.println(e);
         }
+        byte[] data = new byte[imageData.size()];
+        for (int i = 0; i < imageData.size(); i++) {
+            data[i] = imageData.get(i);
+        }
         return new PNG(width, height, bitDepth, colorType, compression, 
-        filter, interlace, gamma, chromaticities, backgroundColor);
+        filter, interlace, gamma, chromaticities, backgroundColor,
+        util.decompress(data));
     }
 
     private void readNextChunk(FileImageInputStream stream) throws IOException { // read all data chunks and concatenate it into one big chunk of data
@@ -57,18 +64,15 @@ public class PNGReader {
             case "cHRM" -> readcHRM(length, stream); 
             case "gAMA" -> readgAMA(length, stream); 
             // case "iCCP" -> 
-            // case "sBIT" -> 
             // case "sRGB" -> 
             // case "PLTE" ->  // Critical, Optional
             case "bKGD" -> readbKGD(length, stream); 
-            // case "hIST" -> 
             // case "tRNS" -> 
             case "pHYs" -> readpHYs(length, stream); 
-            // case "sPLT" -> 
-            // case "tIME" -> 
-            // case "iTXt" -> 
-            // case "tEXt" -> 
-            // case "zTXt" -> 
+            // case "tIME" -> time last modified
+            // case "iTXt" -> compressed text
+            // case "tEXt" -> text
+            // case "zTXt" -> utf 8 text
             case "IDAT" -> readIDAT(length, stream);  // Critical
             case "IEND" -> readIEND(length, stream);  // Critical
             default -> stream.skipBytes(length); 
@@ -117,10 +121,14 @@ public class PNGReader {
     }
 
     private void readIDAT(int length, FileImageInputStream stream) throws IOException {
-        stream.skipBytes(length);
+        byte[] arr = new byte[length];
+        stream.readFully(arr);
+        for (byte b : arr) {
+            imageData.add(b);
+        }
     }
 
-    private void readIEND(int length, FileImageInputStream stream) throws IOException {
+    private void readIEND(int length, FileImageInputStream stream) {
         finished = true;
     }
 
@@ -143,11 +151,11 @@ public class PNGReader {
     private void readbKGD(int length, FileImageInputStream stream) throws IOException {
         switch (colorType) {
             case 3 -> backgroundColor.add(stream.read()); 
-            case 0, 4 -> backgroundColor.add(util.combine2Bytes(stream.readByte(), stream.readByte()));  
+            case 0, 4 -> backgroundColor.add(util.toUInt16(stream.readByte(), stream.readByte()));  
             case 2, 6 -> {
-                int r = util.combine2Bytes(stream.readByte(), stream.readByte()); 
-                int g = util.combine2Bytes(stream.readByte(), stream.readByte());
-                int b = util.combine2Bytes(stream.readByte(), stream.readByte());
+                int r = util.toUInt16(stream.readByte(), stream.readByte()); 
+                int g = util.toUInt16(stream.readByte(), stream.readByte());
+                int b = util.toUInt16(stream.readByte(), stream.readByte());
                 backgroundColor.addAll(Arrays.asList(r, g, b));
             }
         }
@@ -156,8 +164,8 @@ public class PNGReader {
     private void readpHYs(int length, FileImageInputStream stream) throws IOException {
         int pixelsPerUnitX = stream.readInt();
         int pixelsPerUnitY = stream.readInt();
-        int unitSpecifer = stream.read();
+        int unitSpecifer = stream.read(); // 0 is unknown, 1 is meter
+        pixelDimensions.addAll(Arrays.asList(pixelsPerUnitX, pixelsPerUnitY, unitSpecifer));
     }
 
-    // tIME, IDAT, tEXt
 }

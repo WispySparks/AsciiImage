@@ -14,6 +14,7 @@ public class Frame extends JFrame {
         setResizable(false);
         setLocationRelativeTo(null);
         setVisible(true);
+        add(new Panel(png));
     }
 
 }

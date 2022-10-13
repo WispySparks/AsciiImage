@@ -3,6 +3,8 @@ package AsciiImage;
 import java.io.File;
 import java.util.Scanner;
 
+import AsciiImage.Display.Frame;
+
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -13,10 +15,12 @@ public class Main {
         // System.out.println("Width: " + png.width());
         // System.out.println("Height: " + png.height());
         // System.out.println("Bit Depth: " + png.bitDepth());
-        System.out.println("Color Type: " + png.colorType());
+        // System.out.println("Color Type: " + png.colorType());
         // System.out.println("Compression Method: " + png.compression());
         // System.out.println("Filter Method: " + png.filter());
         // System.out.println("Interlace Method: " + png.interlace());
+        System.out.println("arr: " + png.imageData().length); 
         scanner.close();
+        new Frame(png);
     }
 }

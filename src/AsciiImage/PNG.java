@@ -2,7 +2,7 @@ package AsciiImage;
 
 import java.util.List;
 
-public record PNG (
+public record PNG(
     
     int width, // Width of image in pixels
     int height, // Height of image in pixels
@@ -12,8 +12,28 @@ public record PNG (
     int filter, // Valid values are 0
     int interlace, // Valid values are 0 or 1
     int gamma,
-    List<Integer> chromaticities,
+    Chromaticities chromaticities,
     List<Integer> backgroundColor,
+    PixelDimensions pixelDimensions,
     byte[] imageData // uncompressed
 
-) {}
+) {
+    static int gammaFactor = 100000;
+    
+    public record Chromaticities(
+    int whitePointX,
+    int whitePointY,
+    int redX,
+    int redY,
+    int greenX,
+    int greenY,
+    int blueX,
+    int blueY
+    ) {}
+
+    public record PixelDimensions(
+    int pixelsPerUnitX,
+    int pixelsPerUnitY,
+    int unitSpecifer // 0 is unknown, 1 is meter
+    ) {}
+}

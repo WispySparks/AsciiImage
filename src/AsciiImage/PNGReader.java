@@ -9,7 +9,12 @@ import java.util.List;
 
 import javax.imageio.stream.FileImageInputStream;
 
-@SuppressWarnings("unused")
+import AsciiImage.PNG.Chromaticities;
+import AsciiImage.PNG.PixelDimensions;
+import AsciiImage.Util.AsciiTable;
+import AsciiImage.Util.PNGUtil;
+
+// @SuppressWarnings("unused")
 public class PNGReader {
 
     private PNGUtil util = new PNGUtil();
@@ -22,9 +27,9 @@ public class PNGReader {
     private int filter = -1; // Valid values are 0
     private int interlace = -1; // Valid values are 0 or 1
     private int gamma = -1; // gAMA
-    private List<Integer> chromaticities = new ArrayList<>(); // cHRM
+    private Chromaticities chromaticities; // cHRM
     private List<Integer> backgroundColor = new ArrayList<>(); // bKGD
-    private List<Integer> pixelDimensions = new ArrayList<>(); // pHYs
+    private PixelDimensions pixelDimensions; // pHYs
     private List<Byte> imageData = new ArrayList<>(); // IDAT
 
     public PNG readPNG(File pngFile) { //todo write check crc and use it on image header and other chunks
@@ -47,7 +52,7 @@ public class PNGReader {
             data[i] = imageData.get(i);
         }
         return new PNG(width, height, bitDepth, colorType, compression, 
-        filter, interlace, gamma, chromaticities, backgroundColor,
+        filter, interlace, gamma, chromaticities, backgroundColor, pixelDimensions,
         util.decompress(data));
     }
 
@@ -61,34 +66,30 @@ public class PNGReader {
             type += AsciiTable.decimalToAscii(charVal);
         }
         switch (type) {
-            case "cHRM" -> readcHRM(length, stream); 
-            case "gAMA" -> readgAMA(length, stream); 
+            case "cHRM" -> readcHRM(stream); 
+            case "gAMA" -> readgAMA(stream); 
             // case "iCCP" -> 
             // case "sRGB" -> 
             // case "PLTE" ->  // Critical, Optional
-            case "bKGD" -> readbKGD(length, stream); 
+            case "bKGD" -> readbKGD(stream); 
             // case "tRNS" -> 
-            case "pHYs" -> readpHYs(length, stream); 
+            case "pHYs" -> readpHYs(stream); 
             // case "tIME" -> time last modified
             // case "iTXt" -> compressed text
             // case "tEXt" -> text
             // case "zTXt" -> utf 8 text
             case "IDAT" -> readIDAT(length, stream);  // Critical
-            case "IEND" -> readIEND(length, stream);  // Critical
+            case "IEND" -> readIEND(stream);  // Critical
             default -> stream.skipBytes(length); 
         }
         stream.skipBytes(4); // crc
     }
 
     private boolean readPNGSignature(FileImageInputStream stream) throws IOException {
-        if (stream.read() != 137) return false;
-        if (stream.read() != 80) return false;
-        if (stream.read() != 78) return false;
-        if (stream.read() != 71) return false;
-        if (stream.read() != 13) return false;
-        if (stream.read() != 10) return false;
-        if (stream.read() != 26) return false;
-        if (stream.read() != 10) return false;
+        int[] sig = {137, 80, 78, 71, 13, 10, 26, 10};
+        for (int i = 0; i<sig.length; i++) {
+            if (stream.read() != sig[i]) return false;
+        }
         return true;
     }
 
@@ -128,11 +129,11 @@ public class PNGReader {
         }
     }
 
-    private void readIEND(int length, FileImageInputStream stream) {
+    private void readIEND(FileImageInputStream stream) {
         finished = true;
     }
 
-    private void readcHRM(int length, FileImageInputStream stream) throws IOException {
+    private void readcHRM(FileImageInputStream stream) throws IOException {
         int whitePointX = stream.readInt();
         int whitePointY = stream.readInt();
         int redX = stream.readInt();
@@ -141,14 +142,14 @@ public class PNGReader {
         int greenY = stream.readInt();
         int blueX = stream.readInt();
         int blueY = stream.readInt();
-        chromaticities.addAll(Arrays.asList(whitePointX, whitePointY, redX, redY, greenX, greenY, blueX, blueY));
+        chromaticities = new Chromaticities(whitePointX, whitePointY, redX, redY, greenX, greenY, blueX, blueY);
     }
 
-    private void readgAMA(int length, FileImageInputStream stream) throws IOException {
-        gamma = stream.readInt();
+    private void readgAMA(FileImageInputStream stream) throws IOException {
+        gamma = stream.readInt() / PNG.gammaFactor;
     }
 
-    private void readbKGD(int length, FileImageInputStream stream) throws IOException {
+    private void readbKGD(FileImageInputStream stream) throws IOException {
         switch (colorType) {
             case 3 -> backgroundColor.add(stream.read()); 
             case 0, 4 -> backgroundColor.add(util.toUInt16(stream.readByte(), stream.readByte()));  
@@ -161,11 +162,11 @@ public class PNGReader {
         }
     }
 
-    private void readpHYs(int length, FileImageInputStream stream) throws IOException {
+    private void readpHYs(FileImageInputStream stream) throws IOException {
         int pixelsPerUnitX = stream.readInt();
         int pixelsPerUnitY = stream.readInt();
-        int unitSpecifer = stream.read(); // 0 is unknown, 1 is meter
-        pixelDimensions.addAll(Arrays.asList(pixelsPerUnitX, pixelsPerUnitY, unitSpecifer));
+        int unitSpecifer = stream.read();
+        pixelDimensions = new PixelDimensions(pixelsPerUnitX, pixelsPerUnitY, unitSpecifer);
     }
 
 }

@@ -1,4 +1,4 @@
-package AsciiImage;
+package AsciiImage.Util;
 
 import java.util.HashMap;
 

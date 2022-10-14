@@ -7,20 +7,28 @@ public record PNG(
     int width, // Width of image in pixels
     int height, // Height of image in pixels
     int bitDepth, // Valid values are 1, 2, 4, 8, and 16
-    int colorType, // Valid values are 0, 2, 3, 4, and 6
-    int compression, // Valid values are 0
-    int filter, // Valid values are 0
-    int interlace, // Valid values are 0 or 1
-    int gamma,
-    Chromaticities chromaticities,
-    List<Integer> backgroundColor,
-    PixelDimensions pixelDimensions,
-    byte[] imageData // uncompressed
+    ColorType colorType, // Valid values are 0, 2, 3, 4, and 6
+    int compressionMethod, // Valid values are 0
+    int filterMethod, // Valid values are 0
+    int interlaceMethod, // Valid values are 0 or 1
+    int gamma, // gAMA
+    Chromaticities chromaticities, // cHRM
+    List<Integer> backgroundColor, // bKGD
+    PixelDimensions pixelDimensions, // pHYs
+    byte[] imageData // IDAT, uncompressed
 
 ) {
     static int gammaFactor = 100000;
+
+    enum ColorType {
+        GRAYSCALE, // 0
+        RGB, // 2
+        PALETTE, // 3
+        GRAYSCALE_ALPHA, // 4
+        RGB_ALPHA // 6
+    }
     
-    public record Chromaticities(
+    record Chromaticities(
     int whitePointX,
     int whitePointY,
     int redX,
@@ -31,7 +39,7 @@ public record PNG(
     int blueY
     ) {}
 
-    public record PixelDimensions(
+    record PixelDimensions(
     int pixelsPerUnitX,
     int pixelsPerUnitY,
     int unitSpecifer // 0 is unknown, 1 is meter

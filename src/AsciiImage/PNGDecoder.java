@@ -10,27 +10,28 @@ import java.util.List;
 import javax.imageio.stream.FileImageInputStream;
 
 import AsciiImage.PNG.Chromaticities;
+import AsciiImage.PNG.ColorType;
 import AsciiImage.PNG.PixelDimensions;
 import AsciiImage.Util.AsciiTable;
 import AsciiImage.Util.PNGUtil;
 
 // @SuppressWarnings("unused")
-public class PNGReader {
+public class PNGDecoder {
 
     private PNGUtil util = new PNGUtil();
     private boolean finished = false;
-    private int width = -1; // Width of image in pixels
-    private int height = -1; // Height of image in pixels
-    private int bitDepth = -1; // Valid values are 1, 2, 4, 8, and 16
-    private int colorType = -1; // Valid values are 0, 2, 3, 4, and 6
-    private int compression = -1; // Valid values are 0
-    private int filter = -1; // Valid values are 0
-    private int interlace = -1; // Valid values are 0 or 1
-    private int gamma = -1; // gAMA
-    private Chromaticities chromaticities; // cHRM
-    private List<Integer> backgroundColor = new ArrayList<>(); // bKGD
-    private PixelDimensions pixelDimensions; // pHYs
-    private List<Byte> imageData = new ArrayList<>(); // IDAT
+    private int width = -1; 
+    private int height = -1; 
+    private int bitDepth = -1; 
+    private ColorType colorType;
+    private int compression = -1; 
+    private int filter = -1; 
+    private int interlace = -1;
+    private int gamma = -1; 
+    private Chromaticities chromaticities; 
+    private List<Integer> backgroundColor = new ArrayList<>(); 
+    private PixelDimensions pixelDimensions; 
+    private List<Byte> imageData = new ArrayList<>(); 
 
     public PNG readPNG(File pngFile) { //todo write check crc and use it on image header and other chunks
         finished = false;
@@ -114,7 +115,13 @@ public class PNGReader {
         width = new BigInteger(bWidth).intValue();
         height = new BigInteger(bHeight).intValue();
         bitDepth = data[8]; 
-        colorType = data[9];
+        switch(data[9]) {
+            case 0 -> colorType = ColorType.GRAYSCALE;
+            case 2 -> colorType = ColorType.RGB;
+            case 3 -> colorType = ColorType.PALETTE;
+            case 4 -> colorType = ColorType.GRAYSCALE_ALPHA;
+            case 6 -> colorType = ColorType.RGB_ALPHA;
+        }
         compression = data[10];
         filter = data[11];
         interlace = data[12];
@@ -151,9 +158,9 @@ public class PNGReader {
 
     private void readbKGD(FileImageInputStream stream) throws IOException {
         switch (colorType) {
-            case 3 -> backgroundColor.add(stream.read()); 
-            case 0, 4 -> backgroundColor.add(util.toUInt16(stream.readByte(), stream.readByte()));  
-            case 2, 6 -> {
+            case PALETTE -> backgroundColor.add(stream.read()); 
+            case GRAYSCALE, GRAYSCALE_ALPHA -> backgroundColor.add(util.toUInt16(stream.readByte(), stream.readByte()));  
+            case RGB, RGB_ALPHA -> {
                 int r = util.toUInt16(stream.readByte(), stream.readByte()); 
                 int g = util.toUInt16(stream.readByte(), stream.readByte());
                 int b = util.toUInt16(stream.readByte(), stream.readByte());

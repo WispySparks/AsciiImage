@@ -10,7 +10,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         // File file = new File(scanner.nextLine());
         File file = new File("C:\\Users\\wispy\\Downloads\\celeste.png");
-        PNGReader reader = new PNGReader();
+        PNGDecoder reader = new PNGDecoder();
         PNG png = reader.readPNG(file);
         // System.out.println("Width: " + png.width());
         // System.out.println("Height: " + png.height());
@@ -19,7 +19,7 @@ public class Main {
         // System.out.println("Compression Method: " + png.compression());
         // System.out.println("Filter Method: " + png.filter());
         // System.out.println("Interlace Method: " + png.interlace());
-        System.out.println("arr: " + png.imageData().length); 
+        // System.out.println("arr: " + png.imageData().length); 
         scanner.close();
         new Frame(png);
     }

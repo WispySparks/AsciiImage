@@ -9,14 +9,21 @@ import AsciiImage.PNG;
 
 public class Panel extends JPanel {
 
-    PNG png;
+    private PNG png;
     
     Panel(PNG png) {
         this.png = png;
     }
 
     public void paint(Graphics g) {
-        g.setColor(Color.BLUE);
-        g.fillRect(30, 30, 300, 300);
+        System.out.println(png.colorType());
+        Color bgColor = new Color(png.backgroundColor().get(0), png.backgroundColor().get(1), png.backgroundColor().get(2));
+        System.out.println(bgColor);
+        g.setColor(bgColor);
+        for (int i = 0; i<png.height(); i++) {
+            for (int j = 0; j<png.width(); j++) {
+                g.fillRect(j, i, 1, 1);
+            }
+        }
     }
 }

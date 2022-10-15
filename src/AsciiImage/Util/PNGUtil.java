@@ -18,7 +18,7 @@ public class PNGUtil {
         return a & 0xff;
     }
 
-    public int toUInt16(byte a, byte b) {
+    public int toUInt16(byte a, byte b) { // a = MSB, b = LSB
         return toUInt8(a) << 8 | toUInt8(b);
     }
 

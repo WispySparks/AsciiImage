@@ -15,7 +15,6 @@ import AsciiImage.PNG.PixelDimensions;
 import AsciiImage.Util.AsciiTable;
 import AsciiImage.Util.PNGUtil;
 
-// @SuppressWarnings("unused")
 public class PNGDecoder {
 
     private PNGUtil util = new PNGUtil();
@@ -37,9 +36,7 @@ public class PNGDecoder {
         finished = false;
         try {
             FileImageInputStream stream = new FileImageInputStream(pngFile);
-            if (!readPNGSignature(stream)) {
-                System.out.println("Invalid File");
-            }
+            if (!readPNGSignature(stream)) throw new IOException("Doesn't contain PNG Signature"); 
             readIHDR(stream);
             while (!finished) {
                 readNextChunk(stream);
@@ -47,6 +44,7 @@ public class PNGDecoder {
             stream.close();
         } catch (IOException e) {
             System.out.println(e);
+            return new PNG();
         }
         byte[] data = new byte[imageData.size()];
         for (int i = 0; i < imageData.size(); i++) {
@@ -95,7 +93,7 @@ public class PNGDecoder {
     }
 
     private void readIHDR(FileImageInputStream stream) throws IOException {
-        if (stream.readInt() != 13) throw new IOException("Header chunk corrupted");
+        if (stream.readInt() != 13) throw new IOException("Header chunk length incorrect");
         byte[] tBytes = new byte[4];
         stream.readFully(tBytes);
         String type = "";

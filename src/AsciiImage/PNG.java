@@ -1,5 +1,6 @@
 package AsciiImage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public record PNG(
@@ -18,9 +19,9 @@ public record PNG(
     byte[] imageData // IDAT, uncompressed
 
 ) {
-    static int gammaFactor = 100000;
+    public static int gammaFactor = 100000;
 
-    enum ColorType {
+    public enum ColorType {
         GRAYSCALE, // 0
         RGB, // 2
         PALETTE, // 3
@@ -28,7 +29,7 @@ public record PNG(
         RGB_ALPHA // 6
     }
     
-    record Chromaticities(
+    public record Chromaticities(
     int whitePointX,
     int whitePointY,
     int redX,
@@ -39,9 +40,14 @@ public record PNG(
     int blueY
     ) {}
 
-    record PixelDimensions(
+    public record PixelDimensions(
     int pixelsPerUnitX,
     int pixelsPerUnitY,
     int unitSpecifer // 0 is unknown, 1 is meter
     ) {}
+
+    PNG() {
+        this(-1, -1, -1, ColorType.GRAYSCALE, -1, -1, -1, -1, new Chromaticities(-1, -1, -1, -1, -1, -1, -1, -1),
+        new ArrayList<Integer>(), new PixelDimensions(-1, -1, -1), new byte[0]);
+    }
 }

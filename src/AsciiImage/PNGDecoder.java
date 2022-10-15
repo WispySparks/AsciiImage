@@ -2,6 +2,7 @@ package AsciiImage;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StreamCorruptedException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,21 +37,21 @@ public class PNGDecoder {
         finished = false;
         try {
             FileImageInputStream stream = new FileImageInputStream(pngFile);
-            if (!readPNGSignature(stream)) throw new IOException("Doesn't contain PNG Signature"); 
+            readPNGSignature(stream); 
             readIHDR(stream);
             while (!finished) {
                 readNextChunk(stream);
             }
             stream.close();
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
             return new PNG();
         }
         byte[] data = new byte[imageData.size()];
         for (int i = 0; i < imageData.size(); i++) {
             data[i] = imageData.get(i);
         }
-        return new PNG(width, height, bitDepth, colorType, compression, 
+        return new PNG(false, width, height, bitDepth, colorType, compression, 
         filter, interlace, gamma, chromaticities, backgroundColor, pixelDimensions,
         util.decompress(data));
     }
@@ -78,22 +79,21 @@ public class PNGDecoder {
             // case "tEXt" -> text
             // case "zTXt" -> utf 8 text
             case "IDAT" -> readIDAT(length, stream);  // Critical
-            case "IEND" -> readIEND(stream);  // Critical
+            case "IEND" -> readIEND();  // Critical
             default -> stream.skipBytes(length); 
         }
         stream.skipBytes(4); // crc
     }
 
-    private boolean readPNGSignature(FileImageInputStream stream) throws IOException {
+    private void readPNGSignature(FileImageInputStream stream) throws IOException {
         int[] sig = {137, 80, 78, 71, 13, 10, 26, 10};
         for (int i = 0; i<sig.length; i++) {
-            if (stream.read() != sig[i]) return false;
+            if (stream.read() != sig[i]) throw new StreamCorruptedException("Doesn't contain PNG Signature");
         }
-        return true;
     }
 
     private void readIHDR(FileImageInputStream stream) throws IOException {
-        if (stream.readInt() != 13) throw new IOException("Header chunk length incorrect");
+        if (stream.readInt() != 13) throw new StreamCorruptedException("Header Chunk Length Incorrect");
         byte[] tBytes = new byte[4];
         stream.readFully(tBytes);
         String type = "";
@@ -101,7 +101,7 @@ public class PNGDecoder {
             int charVal = tBytes[i];
             type += AsciiTable.decimalToAscii(charVal);
         }
-        if (!type.equals("IHDR")) throw new IOException("Header chunk missing");
+        if (!type.equals("IHDR")) throw new StreamCorruptedException("Header Chunk Missing");
         byte[] data = new byte[13];
         stream.readFully(data);
         byte[] bWidth = new byte[4];
@@ -134,7 +134,7 @@ public class PNGDecoder {
         }
     }
 
-    private void readIEND(FileImageInputStream stream) {
+    private void readIEND() {
         finished = true;
     }
 

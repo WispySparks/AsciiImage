@@ -10,7 +10,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         // File file = new File(scanner.nextLine());
         // File file = new File("C:\\Users\\wispy\\Downloads\\celeste.png");
-        File file = new File("C:\\Users\\wispy\\Pictures\\KamishiroRyoga.jpg");
+        File file = new File("C:\\Users\\wispy\\Pictures\\Saved Pictures\\artemispfp.png");
         PNGDecoder reader = new PNGDecoder();
         PNG png = reader.readPNG(file);
         // System.out.println("Width: " + png.width());

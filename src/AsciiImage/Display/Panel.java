@@ -31,26 +31,37 @@ public class Panel extends JPanel {
     }
 
     public void paint(Graphics g) { // data has a filter applied at every line, one filter per line LINE,
-        Color bgColor = new Color(png.backgroundColor().get(0), png.backgroundColor().get(1), png.backgroundColor().get(2));
-        g.setColor(bgColor);
-        for (int i = 0; i<png.height(); i++) {
-            for (int j = 0; j<png.width(); j++) {
-                g.fillRect(j, i, 1, 1);
-            }
-        }
+        paintBackground(g);
         for (int i = 0; i < data.length; i += lineLength) { // go through every scan line's first byte to see the filter
-            switch(data[i]) {
+            switch(data[i]) { 
                 case 0:
-                System.out.println("gaming");
-                    for (int j = 0; j < lineLength; j++) {
-                        // g.setColor(new Color(data[i+j+1], data[i+j+2], data[i+j+3], data[i+j+4]));
-                        // g.fillRect(j, i/lineLength, 1, 1);
+                    for (int j = 0; j < lineLength; j++) { // todo fix how it grabs colors
+                        g.setColor(new Color(util.toUInt8(data[i+j+1]), util.toUInt8(data[i+j+2]), 
+                        util.toUInt8(data[i+j+3]), util.toUInt8(data[i+j+4])));
+                        g.fillRect(j, i/lineLength, 1, 1);
                     } break;
-                case 1:
+                case 1: 
                 case 2:
                 case 3:
                 case 4:
             }
         } 
+    }
+
+    private void paintBackground(Graphics g) {
+        Color bgColor = null;
+        if (!png.backgroundColor().isEmpty()) {
+            switch(png.colorType()) {
+                case PALETTE -> System.out.println("cry");
+                case GRAYSCALE, GRAYSCALE_ALPHA -> new Color(png.backgroundColor().get(0));
+                case RGB, RGB_ALPHA -> bgColor = new Color(png.backgroundColor().get(0), png.backgroundColor().get(1), png.backgroundColor().get(2));
+            }
+            g.setColor(bgColor);
+            for (int i = 0; i<png.height(); i++) {
+                for (int j = 0; j<png.width(); j++) {
+                    g.fillRect(j, i, 1, 1);
+                }
+            }
+        }
     }
 }

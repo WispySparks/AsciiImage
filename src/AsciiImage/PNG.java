@@ -5,6 +5,7 @@ import java.util.List;
 
 public record PNG(
     
+    boolean isCorrupted,
     int width, // Width of image in pixels
     int height, // Height of image in pixels
     int bitDepth, // Valid values are 1, 2, 4, 8, and 16
@@ -47,7 +48,7 @@ public record PNG(
     ) {}
 
     PNG() {
-        this(-1, -1, -1, ColorType.GRAYSCALE, -1, -1, -1, -1, new Chromaticities(-1, -1, -1, -1, -1, -1, -1, -1),
+        this(true, -1, -1, -1, ColorType.GRAYSCALE, -1, -1, -1, -1, new Chromaticities(-1, -1, -1, -1, -1, -1, -1, -1),
         new ArrayList<Integer>(), new PixelDimensions(-1, -1, -1), new byte[0]);
     }
 }

@@ -19,22 +19,22 @@ import AsciiImage.Util.PNGUtil;
 public class PNGDecoder {
 
     private PNGUtil util = new PNGUtil();
-    private boolean finished = false;
-    private int width = -1; 
-    private int height = -1; 
-    private int bitDepth = -1; 
+    private boolean finished;
+    private int width; 
+    private int height; 
+    private int bitDepth; 
     private ColorType colorType;
-    private int compression = -1; 
-    private int filter = -1; 
-    private int interlace = -1;
-    private int gamma = -1; 
+    private int compression; 
+    private int filter; 
+    private int interlace;
+    private int gamma; 
     private Chromaticities chromaticities; 
-    private List<Integer> backgroundColor = new ArrayList<>(); 
+    private List<Integer> backgroundColor = new ArrayList<>();
     private PixelDimensions pixelDimensions; 
     private List<Byte> imageData = new ArrayList<>(); 
 
-    public PNG readPNG(File pngFile) { //todo write check crc and use it on image header and other chunks
-        finished = false;
+    public PNG readPNG(File pngFile) { // todo write check crc and use it on image header and other chunks
+        reset();
         try {
             FileImageInputStream stream = new FileImageInputStream(pngFile);
             readPNGSignature(stream); 
@@ -174,4 +174,19 @@ public class PNGDecoder {
         pixelDimensions = new PixelDimensions(pixelsPerUnitX, pixelsPerUnitY, unitSpecifer);
     }
 
+    private void reset() {
+        finished = false;
+        width = -1;
+        height = -1;
+        bitDepth = -1;
+        colorType = ColorType.GRAYSCALE;
+        compression = -1;
+        filter = -1;
+        interlace = -1;
+        gamma = -1;
+        // chromaticities = new Chromaticities();
+        // pixelDimensions = new PixelDimensions();
+        backgroundColor.clear();    
+        imageData.clear();
+    }
 }

@@ -34,8 +34,7 @@ public class Panel extends JPanel {
         for (int i = 0; i < lineLength*379; i += lineLength) { // go through every scan line's first byte to see the filter
             switch(data[i]) { 
                 case 0:
-                System.out.println(i);
-                    for (int j = 1; j <= lineLength; j++) { // todo fix how it grabs colors
+                    for (int j = 1; j <= lineLength; j++) { 
                         g.setColor(new Color(util.toUInt8(data[4*j+i]), util.toUInt8(data[4*j+i+1]), 
                         util.toUInt8(data[4*j+i+2]), util.toUInt8(data[4*j+i+3])));
                         g.fillRect(j, i/lineLength, 1, 1);
@@ -46,6 +45,7 @@ public class Panel extends JPanel {
                 case 4:
             }
         } 
+        System.out.println(data.length);
     }
 
     private void paintBackground(Graphics g) {

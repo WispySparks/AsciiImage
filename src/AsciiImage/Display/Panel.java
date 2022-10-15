@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 import AsciiImage.PNG;
 import AsciiImage.Util.PNGUtil;
 
-@SuppressWarnings("unused")
 public class Panel extends JPanel {
 
     private PNGUtil util = new PNGUtil();
@@ -32,12 +31,13 @@ public class Panel extends JPanel {
 
     public void paint(Graphics g) { // data has a filter applied at every line, one filter per line LINE,
         paintBackground(g);
-        for (int i = 0; i < data.length; i += lineLength) { // go through every scan line's first byte to see the filter
+        for (int i = 0; i < lineLength*379; i += lineLength) { // go through every scan line's first byte to see the filter
             switch(data[i]) { 
                 case 0:
-                    for (int j = 0; j < lineLength; j++) { // todo fix how it grabs colors
-                        g.setColor(new Color(util.toUInt8(data[i+j+1]), util.toUInt8(data[i+j+2]), 
-                        util.toUInt8(data[i+j+3]), util.toUInt8(data[i+j+4])));
+                System.out.println(i);
+                    for (int j = 1; j <= lineLength; j++) { // todo fix how it grabs colors
+                        g.setColor(new Color(util.toUInt8(data[4*j+i]), util.toUInt8(data[4*j+i+1]), 
+                        util.toUInt8(data[4*j+i+2]), util.toUInt8(data[4*j+i+3])));
                         g.fillRect(j, i/lineLength, 1, 1);
                     } break;
                 case 1: 

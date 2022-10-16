@@ -6,6 +6,7 @@ import java.util.List;
 public record PNG(
     
     boolean isCorrupted,
+    // Header Chunk
     int width, // Width of image in pixels
     int height, // Height of image in pixels
     int bitDepth, // Valid values are 1, 2, 4, 8, and 16
@@ -13,6 +14,7 @@ public record PNG(
     int compressionMethod, // Valid values are 0
     int filterMethod, // Valid values are 0
     int interlaceMethod, // Valid values are 0 or 1
+    
     int gamma, // gAMA
     Chromaticities chromaticities, // cHRM
     List<Integer> backgroundColor, // bKGD

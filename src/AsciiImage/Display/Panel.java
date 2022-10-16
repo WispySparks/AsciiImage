@@ -26,17 +26,17 @@ public class Panel extends JPanel {
             case RGB_ALPHA -> 4; // R, G, B, A
         };
         lineLength = bytesPerPixel * png.width() + 1;
-        if (data.length / lineLength == png.height()) System.out.println("HOORAY!");
+        if (data.length / lineLength == png.height()) System.out.println("HOORAY!"); // something is lining up here
     }
 
     public void paint(Graphics g) { // data has a filter applied at every line, one filter per line LINE,
         paintBackground(g);
-        for (int i = 0; i < lineLength*379; i += lineLength) { // go through every scan line's first byte to see the filter
-            switch(data[i]) { 
+        for (int i = 0; i < lineLength*(png.height()-4); i += lineLength) { // go through every scan line's first byte to see the filter
+            switch(data[i]) {  // todo ^ that number doesnt seem right
                 case 0:
-                    for (int j = 1; j <= lineLength; j++) { 
-                        g.setColor(new Color(util.toUInt8(data[4*j+i]), util.toUInt8(data[4*j+i+1]), 
-                        util.toUInt8(data[4*j+i+2]), util.toUInt8(data[4*j+i+3])));
+                    for (int j = 1; j <= lineLength; j++) { // todo why is alpha byte first ????
+                        g.setColor(new Color(util.toUInt8(data[4*j+i+1]), 
+                        util.toUInt8(data[4*j+i+2]), util.toUInt8(data[4*j+i+3]), util.toUInt8(data[4*j+i])));
                         g.fillRect(j, i/lineLength, 1, 1);
                     } break;
                 case 1: 
@@ -45,7 +45,6 @@ public class Panel extends JPanel {
                 case 4:
             }
         } 
-        System.out.println(data.length);
     }
 
     private void paintBackground(Graphics g) {

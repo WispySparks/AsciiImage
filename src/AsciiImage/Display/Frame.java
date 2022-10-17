@@ -3,7 +3,7 @@ package AsciiImage.Display;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-import AsciiImage.PNG;
+import AsciiImage.PNG.PNG;
 
 public class Frame extends JFrame {
     

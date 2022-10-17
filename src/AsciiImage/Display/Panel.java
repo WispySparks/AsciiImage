@@ -2,51 +2,34 @@ package AsciiImage.Display;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.List;
 
 import javax.swing.JPanel;
 
-import AsciiImage.PNG;
-import AsciiImage.Util.PNGUtil;
+import AsciiImage.PNG.PNG;
+import AsciiImage.PNG.PNGReader;
+import AsciiImage.PNG.Pixel;
 
 public class Panel extends JPanel {
 
-    private PNGUtil util = new PNGUtil();
-    private PNG png;
-    private byte[] data;
-    private int lineLength;
+    private PNGReader reader;
+    private List<Pixel> pixels;
     
     Panel(PNG png) {
-        this.png = png;
-        data = png.imageData();
-        int bytesPerPixel = switch(png.colorType()) {
-            case GRAYSCALE -> 1; // G
-            case GRAYSCALE_ALPHA -> 2; // G, A
-            case PALETTE -> 1; // Indexed Color
-            case RGB -> 3; // R, G, B
-            case RGB_ALPHA -> 4; // R, G, B, A
-        };
-        lineLength = bytesPerPixel * png.width() + 1;
-        if (data.length / lineLength == png.height()) System.out.println("HOORAY!"); // something is lining up here
+        reader = new PNGReader(png);
+        pixels = reader.parseImageData();
     }
 
     public void paint(Graphics g) { // data has a filter applied at every line, one filter per line LINE,
-        paintBackground(g);
-        for (int i = 0; i < lineLength*(png.height()-4); i += lineLength) { // go through every scan line's first byte to see the filter
-            switch(data[i]) {  // todo ^ that number doesnt seem right
-                case 0:
-                    for (int j = 1; j <= lineLength; j++) { // todo why is alpha byte first ????
-                        g.setColor(new Color(util.toUInt8(data[4*j+i+1]), 
-                        util.toUInt8(data[4*j+i+2]), util.toUInt8(data[4*j+i+3]), util.toUInt8(data[4*j+i])));
-                        g.fillRect(j, i/lineLength, 1, 1);
-                    } break;
-                case 1: 
-                case 2:
-                case 3:
-                case 4:
-            }
-        } 
+        System.out.println("painting");
+        for (Pixel p : pixels) {
+            Color c = new Color(p.R(), p.G(), p.B(), p.A());
+            g.setColor(c);
+            g.fillRect(p.X(), p.Y(), 1, 1);
+        }
     }
 
+    /*
     private void paintBackground(Graphics g) {
         Color bgColor = null;
         if (!png.backgroundColor().isEmpty()) {
@@ -63,4 +46,5 @@ public class Panel extends JPanel {
             }
         }
     }
+    */
 }

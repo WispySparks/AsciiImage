@@ -1,4 +1,4 @@
-package AsciiImage;
+package AsciiImage.PNG;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +10,9 @@ import java.util.List;
 
 import javax.imageio.stream.FileImageInputStream;
 
-import AsciiImage.PNG.Chromaticities;
-import AsciiImage.PNG.ColorType;
-import AsciiImage.PNG.PixelDimensions;
+import AsciiImage.PNG.PNG.Chromaticities;
+import AsciiImage.PNG.PNG.ColorType;
+import AsciiImage.PNG.PNG.PixelDimensions;
 import AsciiImage.Util.AsciiTable;
 import AsciiImage.Util.PNGUtil;
 

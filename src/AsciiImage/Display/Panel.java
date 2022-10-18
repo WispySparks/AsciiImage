@@ -21,9 +21,10 @@ public class Panel extends JPanel {
     }
 
     public void paint(Graphics g) { // data has a filter applied at every line, one filter per line LINE,
-        System.out.println("painting");
         for (Pixel p : pixels) {
-            Color c = new Color(p.R(), p.G(), p.B(), p.A());
+            int gray = Math.round((p.R() + p.G() + p.B()) / 3);
+            Color c = new Color(gray, gray, gray);
+            // Color c = new Color(p.R(), p.G(), p.B(), p.A());
             g.setColor(c);
             g.fillRect(p.X(), p.Y(), 1, 1);
         }

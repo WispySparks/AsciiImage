@@ -22,11 +22,18 @@ public class Panel extends JPanel {
 
     public void paint(Graphics g) { // data has a filter applied at every line, one filter per line LINE,
         for (Pixel p : pixels) {
-            int gray = Math.round((p.R() + p.G() + p.B()) / 3);
-            Color c = new Color(gray, gray, gray);
-            // Color c = new Color(p.R(), p.G(), p.B(), p.A());
+            // int gray = Math.round((p.R() + p.G() + p.B()) / 3);
+            // Color c = new Color(gray, gray, gray);
+            Color c = new Color(p.R(), p.G(), p.B(), p.A());
             g.setColor(c);
             g.fillRect(p.X(), p.Y(), 1, 1);
+            // if (c.getRed() > 100) {
+            //     g.drawString("A", p.X(), p.Y());
+            // } else if (c.getRed() > 50) {
+            //     g.drawString("*", p.X(), p.Y());
+            // } else {
+            //     g.drawString(" ", p.X(), p.Y());
+            // }
         }
     }
 

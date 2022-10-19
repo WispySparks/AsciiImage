@@ -40,22 +40,22 @@ public class PNGReader {
                         j, i/lineLength));
                     } break;
                 case 1: // a r g b a r g b
-                System.out.println((i/lineLength));
-                    for (int j = 1; j<lineLength; j++) {
-                        int xR = util.toUInt8(data[4*j+i+1]);
-                        int xG = util.toUInt8(data[4*j+i+2]);
-                        int xB = util.toUInt8(data[4*j+i+3]);
-                        int xA = util.toUInt8(data[4*j+i]);
-                        if (j > 1) {
-                            int aR = pixels.get(j-2 + (png.width()*(i/lineLength))).R();
-                            int aG = pixels.get(j-2 + (png.width()*(i/lineLength))).G();
-                            int aB = pixels.get(j-2 + (png.width()*(i/lineLength))).B();
-                            int aA = pixels.get(j-2 + (png.width()*(i/lineLength))).A();
-                            pixels.add(new Pixel((xR + aR)%256, (xG + aG)%256, (xB + aB)%256, (xA + aA)%256, j, i/lineLength));
-                        } else {
-                            pixels.add(new Pixel(xR, xB, xG, xA, j, i/lineLength));
-                        }
-                    } break;
+                // System.out.println((i/lineLength));
+                //     for (int j = 1; j<lineLength; j++) {
+                //         int xR = util.toUInt8(data[4*j+i+1]);
+                //         int xG = util.toUInt8(data[4*j+i+2]);
+                //         int xB = util.toUInt8(data[4*j+i+3]);
+                //         int xA = util.toUInt8(data[4*j+i]);
+                //         if (j > 1) {
+                //             int aR = pixels.get(j-2 + (png.width()*(i/lineLength))).R();
+                //             int aG = pixels.get(j-2 + (png.width()*(i/lineLength))).G();
+                //             int aB = pixels.get(j-2 + (png.width()*(i/lineLength))).B();
+                //             int aA = pixels.get(j-2 + (png.width()*(i/lineLength))).A();
+                //             pixels.add(new Pixel((xR + aR)%256, (xG + aG)%256, (xB + aB)%256, (xA + aA)%256, j, i/lineLength));
+                //         } else {
+                //             pixels.add(new Pixel(xR, xB, xG, xA, j, i/lineLength));
+                //         }
+                //     } break;
                 case 2:
                 // for (int j = 1; j<lineLength; j++) {
                 //     int xR = util.toUInt8(data[4*j+i+1]);

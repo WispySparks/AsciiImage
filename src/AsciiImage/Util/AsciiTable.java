@@ -103,11 +103,11 @@ public class AsciiTable {
         map.put(126, "~");
     }
     
-    public static String decimalToAscii(int i) {
-        if (map.containsKey(i)) {
-            return map.get(i);
+    public static String decimalToAscii(int asciiCode) {
+        if (map.containsKey(asciiCode)) {
+            return map.get(asciiCode);
         }
-        return "";
+        throw new IllegalArgumentException("asciiCode: " + asciiCode + " is not between 32-126");
     }
 
 }

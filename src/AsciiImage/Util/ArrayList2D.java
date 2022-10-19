@@ -49,13 +49,44 @@ public class ArrayList2D<T> {
     }
 
     /**
+     * @param i Index of list in 2D ArrayList
+     * @param elementIndex Index within specified list to remove
+     */
+    public void set(int i, int elementIndex) {
+        list2D.get(i).remove(elementIndex);
+    }
+
+    /**
      * Retrieves an element from a list in the 2D ArrayList
      * @param i Index of list in 2D ArrayList
-     * @param j Index of element in i list
+     * @param elementIndex Index of element within specified list
      * @return element at j index of the list at i index of 2D ArrayList
      */
-    public T get(int i, int j) {
-        return list2D.get(i).get(j);
+    public T get(int i, int elementIndex) {
+        return list2D.get(i).get(elementIndex);
+    }
+
+    /**
+     * @param i Index of list in 2D ArrayList
+     * @param elementIndex Index within specified list
+     * @param item element to remove
+     */
+    public void remove(int i, int elementIndex, T item) {
+        list2D.get(i).set(elementIndex, item);
+    }
+
+    /**
+     * @param i Index of list in 2D ArrayList
+     */
+    public void clear(int i) {
+        list2D.get(i).clear();
+    }
+
+    /**
+     * @param i Index of list in 2D ArrayList
+     */
+    public void clearAll(int i) {
+        list2D.clear();
     }
 
     /**
@@ -65,6 +96,7 @@ public class ArrayList2D<T> {
     public int size() {
         return list2D.size();
     }
+    
     /**
      * Retrieves size of a list in the 2D ArrayList
      * @param i Index of specific list in the 2D ArrayList
@@ -75,6 +107,37 @@ public class ArrayList2D<T> {
             return 0;
         }
         return list2D.get(i).size();
+    }   
+
+    /**
+     * Transfers everything in this 2D list into a single list
+     * @return list
+     */
+    public List<T> toSingleList() {
+        if (list2D.size() > 0) {
+            List<T> fList = list2D.get(0);
+            for (List<T> l : list2D) {
+                fList.addAll(l);
+            }
+            return fList;
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * Used to grab the list and perform all the operations that I don't implement here
+     * @param i Index of specific list in the 2D ArrayList
+     * @return that list object
+     */
+    public List<T> getList(int i) {
+        return list2D.get(i);
+    }
+
+    /**
+     * @return Multidimensional list contained in this class
+     */
+    public List<List<T>> get2DList() {
+        return list2D;
     }
 
     @Override
@@ -91,6 +154,21 @@ public class ArrayList2D<T> {
         }
         full = full.trim();
         return full;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj instanceof ArrayList2D) {
+            ArrayList2D<?> aL = (ArrayList2D<?>) obj; 
+            if (list2D.equals(aL.get2DList())) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return list2D.hashCode();
     }
 
 }

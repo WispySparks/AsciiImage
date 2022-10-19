@@ -27,7 +27,7 @@ public class PNGDecoder {
     private int compression; 
     private int filter; 
     private int interlace;
-    private int gamma; 
+    private double gamma; 
     private Chromaticities chromaticities; 
     private List<Integer> backgroundColor = new ArrayList<>();
     private PixelDimensions pixelDimensions; 

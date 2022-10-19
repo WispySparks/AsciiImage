@@ -15,7 +15,7 @@ public record PNG(
     int filterMethod, // Valid values are 0
     int interlaceMethod, // Valid values are 0 or 1
     
-    int gamma, // gAMA
+    double gamma, // gAMA
     Chromaticities chromaticities, // cHRM
     List<Integer> backgroundColor, // bKGD
     PixelDimensions pixelDimensions, // pHYs

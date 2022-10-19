@@ -2,18 +2,18 @@ package AsciiImage.Display;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.List;
 
 import javax.swing.JPanel;
 
 import AsciiImage.PNG.PNG;
 import AsciiImage.PNG.PNGReader;
 import AsciiImage.PNG.Pixel;
+import AsciiImage.Util.ArrayList2D;
 
 public class Panel extends JPanel {
 
     private PNGReader reader;
-    private List<Pixel> pixels;
+    private ArrayList2D<Pixel> pixels;
     
     Panel(PNG png) {
         reader = new PNGReader(png);
@@ -21,7 +21,7 @@ public class Panel extends JPanel {
     }
 
     public void paint(Graphics g) { // data has a filter applied at every line, one filter per line LINE,
-        for (Pixel p : pixels) {
+        for (Pixel p : pixels.toSingleList()) {
             // int gray = Math.round((p.R() + p.G() + p.B()) / 3);
             // Color c = new Color(gray, gray, gray);
             Color c = new Color(p.R(), p.G(), p.B(), p.A());

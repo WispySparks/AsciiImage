@@ -3,7 +3,7 @@ package AsciiImage.PNG;
 import AsciiImage.Util.ArrayList2D;
 import AsciiImage.Util.PNGUtil;
 
-public class PNGReader {
+public class PNGReader { // todo read other color types than rgb alpha
     
     private PNGUtil util = new PNGUtil();
     private PNG png;
@@ -24,42 +24,180 @@ public class PNGReader {
         lineLength = bytesPerPixel * png.width() + 1;
         if (data.length / lineLength == png.height()) System.out.println("HOORAY!"); // something is lining up here
     }
-    /** 4 * 5 + 1 = 21 times, 20 bytes
+
+    public ArrayList2D<Pixel> parseImageData() {
+        return switch(png.colorType()) {
+            case GRAYSCALE -> parseRGBAData();
+            case GRAYSCALE_ALPHA -> parseRGBAData();
+            case PALETTE -> parseRGBAData();
+            case RGB -> parseRGBAData();
+            case RGB_ALPHA -> parseRGBAData();
+        };
+    }
+
+    /** 
      * {@link} https://www.w3.org/TR/PNG/#9Filter-types
      */
-    public ArrayList2D<Pixel> parseImageData() {
+    public ArrayList2D<Pixel> parseRGBAData() {
         ArrayList2D<Pixel> pixels = new ArrayList2D<>();
         for (int i = 0; i < data.length; i += lineLength) { // go through every scan line's first byte to see the filter
+            int currentLine = i/lineLength;
             switch(data[i]) {
-                case 0: 
+                case 0:
                     for (int j = 0; j < png.width(); j++) { // data has +1 offset for the first byte being filter byte
                         Pixel p = new Pixel(util.toUInt8(data[4*j+i+1]), util.toUInt8(data[4*j+i+2]), 
-                        util.toUInt8(data[4*j+i+3]), util.toUInt8(data[4*j+i+4]), j, i/lineLength);
-                        pixels.add(i/lineLength, p);
+                        util.toUInt8(data[4*j+i+3]), util.toUInt8(data[4*j+i+4]), j, currentLine);
+                        pixels.add(currentLine, p);
                     } break;
-                case 1: // r g b a r g b a
-                // System.out.println((i/lineLength));
-                //     for (int j = 1; j<lineLength; j++) {
-                //         int xR = util.toUInt8(data[4*j+i+1]);
-                //         int xG = util.toUInt8(data[4*j+i+2]);
-                //         int xB = util.toUInt8(data[4*j+i+3]);
-                //         int xA = util.toUInt8(data[4*j+i]);
-                //         if (j > 1) {
-                //             int aR = pixels.get(j-2 + (png.width()*(i/lineLength))).R();
-                //             int aG = pixels.get(j-2 + (png.width()*(i/lineLength))).G();
-                //             int aB = pixels.get(j-2 + (png.width()*(i/lineLength))).B();
-                //             int aA = pixels.get(j-2 + (png.width()*(i/lineLength))).A();
-                //             pixels.add(new Pixel((xR + aR)%256, (xG + aG)%256, (xB + aB)%256, (xA + aA)%256, j, i/lineLength));
-                //         } else {
-                //             pixels.add(new Pixel(xR, xB, xG, xA, j, i/lineLength));
-                //         }
-                //     } break;
+                case 1: 
+                    for (int j = 0; j < png.width(); j++) { // data has +1 offset for the first byte being filter byte
+                        int xR = util.toUInt8(data[4*j+i+1]);
+                        int xG = util.toUInt8(data[4*j+i+2]);
+                        int xB = util.toUInt8(data[4*j+i+3]);
+                        int xA = util.toUInt8(data[4*j+i+4]);
+
+                        int aR = 0;
+                        int aG = 0;
+                        int aB = 0;
+                        int aA = 0;
+
+                        if (j > 0) {
+                            Pixel prevP = pixels.get(currentLine, j-1);
+                            aR = prevP.R();
+                            aG = prevP.G();
+                            aB = prevP.B();
+                            aA = prevP.A();
+                        }
+                        pixels.add(currentLine, new Pixel((xR + aR)%256, (xG + aG)%256, (xB + aB)%256, (xA + aA)%256, j, currentLine));
+                    } break;
                 case 2:
-                case 3:
-                case 4:
+                    for (int j = 0; j < png.width(); j++) { // data has +1 offset for the first byte being filter byte
+                        int xR = util.toUInt8(data[4*j+i+1]);
+                        int xG = util.toUInt8(data[4*j+i+2]);
+                        int xB = util.toUInt8(data[4*j+i+3]);
+                        int xA = util.toUInt8(data[4*j+i+4]);
+
+                        int bR = 0;
+                        int bG = 0;
+                        int bB = 0;
+                        int bA = 0;
+
+                        if (i > 0) {
+                            Pixel aboveP = pixels.get(currentLine-1, j);
+                            bR = aboveP.R();
+                            bG = aboveP.G();
+                            bB = aboveP.B();
+                            bA = aboveP.A();
+                        }
+                        pixels.add(currentLine, new Pixel((xR + bR)%256, (xG + bG)%256, (xB + bB)%256, (xA + bA)%256, j, currentLine));
+                    } break;
+                case 3: //  Filt(x) + floor((Recon(a) + Recon(b)) / 2)
+                    for (int j = 0; j < png.width(); j++) { // data has +1 offset for the first byte being filter byte
+                        int xR = util.toUInt8(data[4*j+i+1]);
+                        int xG = util.toUInt8(data[4*j+i+2]);
+                        int xB = util.toUInt8(data[4*j+i+3]);
+                        int xA = util.toUInt8(data[4*j+i+4]);
+
+                        int aR = 0;
+                        int aG = 0;
+                        int aB = 0;
+                        int aA = 0;
+
+                        int bR = 0;
+                        int bG = 0;
+                        int bB = 0;
+                        int bA = 0;
+
+                        if (j > 0) {
+                            Pixel prevP = pixels.get(currentLine, j-1);
+                            aR = prevP.R();
+                            aG = prevP.G();
+                            aB = prevP.B();
+                            aA = prevP.A();
+                        }
+                        if (i > 0) {
+                            Pixel aboveP = pixels.get(currentLine-1, j);
+                            bR = aboveP.R();
+                            bG = aboveP.G();
+                            bB = aboveP.B();
+                            bA = aboveP.A();
+                        }
+                        int R = (int) Math.floor((aR + bR)/2) + xR;
+                        int G = (int) Math.floor((aG + bG)/2) + xG;
+                        int B = (int) Math.floor((aB + bB)/2) + xB;
+                        int A = (int) Math.floor((aA + bA)/2) + xA;
+                        pixels.add(currentLine, new Pixel(R%256, G%256, B%256, A%256, j, currentLine));
+                    } break;
+                case 4: // Filt(x) + PaethPredictor(Recon(a), Recon(b), Recon(c))
+                    for (int j = 0; j < png.width(); j++) {
+                        int xR = util.toUInt8(data[4*j+i+1]);
+                        int xG = util.toUInt8(data[4*j+i+2]);
+                        int xB = util.toUInt8(data[4*j+i+3]);
+                        int xA = util.toUInt8(data[4*j+i+4]);
+
+                        int aR = 0;
+                        int aG = 0;
+                        int aB = 0;
+                        int aA = 0;
+
+                        int bR = 0;
+                        int bG = 0;
+                        int bB = 0;
+                        int bA = 0;
+
+                        int cR = 0;
+                        int cG = 0;
+                        int cB = 0;
+                        int cA = 0;
+
+                        if (j > 0) {
+                            Pixel prevP = pixels.get(currentLine, j-1);
+                            aR = prevP.R();
+                            aG = prevP.G();
+                            aB = prevP.B();
+                            aA = prevP.A();
+                        }
+                        if (i > 0) {
+                            Pixel aboveP = pixels.get(currentLine-1, j);
+                            bR = aboveP.R();
+                            bG = aboveP.G();
+                            bB = aboveP.B();
+                            bA = aboveP.A();
+                        }
+                        if (i > 0 && j > 0) {
+                            Pixel diagonalP = pixels.get(currentLine-1, j-1);
+                            cR = diagonalP.R();
+                            cG = diagonalP.G();
+                            cB = diagonalP.B();
+                            cA = diagonalP.A();
+                        }
+                        int R = PaethPredictor(aR, bR, cR) + xR;
+                        int G = PaethPredictor(aG, bG, cG) + xG;
+                        int B = PaethPredictor(aB, bB, cB) + xB;
+                        int A = PaethPredictor(aA, bA, cA) + xA;
+                        pixels.add(currentLine, new Pixel(R%256, G%256, B%256, A%256, j, currentLine));
+                    } break;
             }
         }
         return pixels;
+    }
+
+    private int PaethPredictor(int a, int b, int c) {
+        int p = a + b - c;
+        int pa = Math.abs(p - a);
+        int pb = Math.abs(p - b);
+        int pc = Math.abs(p - c);
+        int Pr;
+        if (pa <= pb && pa <= pc) {
+            Pr = a;
+        }
+        else if (pb <= pc) {
+            Pr = b;
+        }
+        else {
+            Pr = c;
+        }
+        return Pr;
     }
 
 }

@@ -14,7 +14,7 @@ public class ArrayList2D<T> {
     /**
      * Two dimensional list.
      */
-    private List<List<T>> list2D;
+    private final List<List<T>> list2D;
 
     /**
      * Creates a 2D ArrayList.
@@ -40,7 +40,9 @@ public class ArrayList2D<T> {
      */
     public void add(int i, T item) {
         if (i >= list2D.size()) {
-            list2D.add(new ArrayList<>());
+            for (int j = list2D.size(); j <= i; j++) {
+                list2D.add(j, new ArrayList<>());
+            }
             list2D.get(i).add(item);
         }
         else {

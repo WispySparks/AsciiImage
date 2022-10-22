@@ -1,4 +1,4 @@
-package AsciiImage.PNG;
+package main.java.AsciiImage.PNG;
 
 public record Pixel(
 

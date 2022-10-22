@@ -1,9 +1,9 @@
-package AsciiImage.PNG;
+package main.java.AsciiImage.PNG;
 
-import AsciiImage.Util.ArrayList2D;
-import AsciiImage.Util.PNGUtil;
+import main.java.AsciiImage.Util.ArrayList2D;
+import main.java.AsciiImage.Util.PNGUtil;
 
-public class PNGReader { // todo read other color types than rgb alpha
+public class PNGReader { // todo read other color types than rgb alpha also gamma/color, looks like we can ignore bKGD
     
     private PNGUtil util = new PNGUtil();
     private PNG png;

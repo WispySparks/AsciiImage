@@ -1,4 +1,4 @@
-package AsciiImage.PNG;
+package main.java.AsciiImage.PNG;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,11 +10,11 @@ import java.util.List;
 
 import javax.imageio.stream.FileImageInputStream;
 
-import AsciiImage.PNG.PNG.Chromaticities;
-import AsciiImage.PNG.PNG.ColorType;
-import AsciiImage.PNG.PNG.PixelDimensions;
-import AsciiImage.Util.AsciiTable;
-import AsciiImage.Util.PNGUtil;
+import main.java.AsciiImage.PNG.PNG.Chromaticities;
+import main.java.AsciiImage.PNG.PNG.ColorType;
+import main.java.AsciiImage.PNG.PNG.PixelDimensions;
+import main.java.AsciiImage.Util.AsciiTable;
+import main.java.AsciiImage.Util.PNGUtil;
 
 public class PNGDecoder {
 

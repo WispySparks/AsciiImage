@@ -58,13 +58,45 @@ public class PNGUtil {
         } catch (IOException e) {e.printStackTrace();}
         return stuff;
     }
-
-    public long computeCRC32(byte[] data) {
-        final long polynomial = 0x104C11DB7L; // 32 bit crc generator polynomial (divisor)
-        long crc = 0;
-        crc ^= polynomial;
-        System.out.println(crc);
-        return crc;
-    }
     
+    // * https://www.w3.org/TR/2003/REC-PNG-20031110/#D-CRCAppendix
+
+    private static long crcTable[] = new long[256]; // Table of CRCs of all 8-bit messages.
+    private static boolean madeTable = false;
+
+    public static void makeCRCTable() { // Make the table for a fast CRC. 
+        if (madeTable) return;
+        long c;
+        int n, k;
+        for (n = 0; n < 256; n++) {
+            c = (long) n;
+            for (k = 0; k < 8; k++) {
+                if ((c & 1) == 1)
+                c = 0xedb88320L ^ (c >> 1);
+                else
+                c = c >> 1;
+            }
+            crcTable[n] = c;
+        }
+        madeTable = true;
+    }
+
+    /* Update a running CRC with the bytes buf[0..len-1]--the CRC
+      should be initialized to all 1's, and the transmitted value
+      is the 1's complement of the final running CRC (see the
+      crc() routine below). */
+    private long updateCRC(long crc, byte[] buf, int len) {
+        long c = crc;
+        int n;
+        for (n = 0; n < len; n++) {
+            c = crcTable[(int) ((c ^ buf[n]) & 0xff)] ^ (c >> 8);
+        }
+        return c;
+    }
+
+    // Return the CRC of the bytes buf
+    public long crc(byte[] buf) {
+        return updateCRC(0xffffffffL, buf, buf.length) ^ 0xffffffffL;
+    }
+
 }

@@ -33,7 +33,7 @@ public class PNGDecoder {
     private PixelDimensions pixelDimensions; 
     private List<Byte> imageData = new ArrayList<>(); 
 
-    public PNG readPNG(File pngFile) { // todo write check crc and use it on image header and other chunks
+    public PNG readPNG(File pngFile) { 
         reset();
         try {
             FileImageInputStream stream = new FileImageInputStream(pngFile);
@@ -82,7 +82,8 @@ public class PNGDecoder {
             case "IEND" -> readIEND();  // Critical
             default -> stream.skipBytes(length); 
         }
-        stream.skipBytes(4); // crc
+        System.out.println(type + " " + stream.readInt());
+        // stream.skipBytes(4); // crc
     }
 
     private void readPNGSignature(FileImageInputStream stream) throws IOException {
@@ -136,6 +137,8 @@ public class PNGDecoder {
 
     private void readIEND() {
         finished = true;
+        // byte[] b = {73, 69, 78, 68};
+        // System.out.println(util.crc(b));
     }
 
     private void readcHRM(FileImageInputStream stream) throws IOException {

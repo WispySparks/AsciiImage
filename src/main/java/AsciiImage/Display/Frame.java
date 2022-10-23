@@ -16,6 +16,8 @@ public class Frame extends JFrame {
             setLocationRelativeTo(null);
             setVisible(true);
             add(new Panel(png));
+        } else {
+            System.out.println("PNG is Corrupted");
         }
     }
 

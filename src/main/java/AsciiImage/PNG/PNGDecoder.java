@@ -82,8 +82,7 @@ public class PNGDecoder {
             case "IEND" -> readIEND();  // Critical
             default -> stream.skipBytes(length); 
         }
-        System.out.println(type + " " + stream.readInt());
-        // stream.skipBytes(4); // crc
+        stream.skipBytes(4); // crc
     }
 
     private void readPNGSignature(FileImageInputStream stream) throws IOException {
@@ -137,8 +136,6 @@ public class PNGDecoder {
 
     private void readIEND() {
         finished = true;
-        // byte[] b = {73, 69, 78, 68};
-        // System.out.println(util.crc(b));
     }
 
     private void readcHRM(FileImageInputStream stream) throws IOException {
@@ -187,8 +184,8 @@ public class PNGDecoder {
         filter = -1;
         interlace = -1;
         gamma = -1;
-        // chromaticities = new Chromaticities();
-        // pixelDimensions = new PixelDimensions();
+        chromaticities = new Chromaticities();
+        pixelDimensions = new PixelDimensions();
         backgroundColor.clear();    
         imageData.clear();
     }

@@ -41,13 +41,21 @@ public record PNG(
     int greenY,
     int blueX,
     int blueY
-    ) {}
+    ) {
+        Chromaticities() {
+            this(-1, -1, -1, -1, -1, -1, -1, -1);
+        }
+    }
 
     public record PixelDimensions(
     int pixelsPerUnitX,
     int pixelsPerUnitY,
     int unitSpecifer // 0 is unknown, 1 is meter
-    ) {}
+    ) {
+        PixelDimensions() {
+            this(-1, -1, -1);
+        }
+    }
 
     PNG() {
         this(true, -1, -1, -1, ColorType.GRAYSCALE, -1, -1, -1, -1, new Chromaticities(-1, -1, -1, -1, -1, -1, -1, -1),

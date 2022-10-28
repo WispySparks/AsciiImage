@@ -1,5 +1,6 @@
 package main.java.AsciiImage.PNG;
 
+import main.java.AsciiImage.PNG.PNG.ColorType;
 import main.java.AsciiImage.Util.ArrayList2D;
 import main.java.AsciiImage.Util.PNGUtil;
 
@@ -22,7 +23,7 @@ public class PNGReader { // todo read other color types than rgb alpha also gamm
             case RGB_ALPHA -> 4; // R, G, B, A
         };
         lineLength = bytesPerPixel * png.width() + 1;
-        if (data.length / lineLength == png.height()) System.out.println("HOORAY!"); // something is lining up here
+        // if (data.length / lineLength == png.height()) System.out.println("HOORAY!"); // something is lining up here
     }
 
     /** 
@@ -30,14 +31,23 @@ public class PNGReader { // todo read other color types than rgb alpha also gamm
      */
     public ArrayList2D<Pixel> parseImageData() {
         ArrayList2D<Pixel> pixels = new ArrayList2D<>();
+        int multiplier = switch (png.colorType()) {
+            case GRAYSCALE -> 1;
+            case GRAYSCALE_ALPHA -> 2;
+            case PALETTE -> 1;
+            case RGB -> 3;
+            case RGB_ALPHA -> 4;
+        };
         for (int i = 0; i < data.length; i += lineLength) { // go through every scan line's first byte to see the filter
             int currentLine = i/lineLength;
             for (int j = 0; j<png.width(); j++) {
-                int xR = util.toUInt8(data[4*j+i+1]);
-                int xG = util.toUInt8(data[4*j+i+2]);
-                int xB = util.toUInt8(data[4*j+i+3]);
-                int xA = util.toUInt8(data[4*j+i+4]);
-
+                int xR = util.toUInt8(data[multiplier*j+i+1]);
+                int xG = util.toUInt8(data[multiplier*j+i+2]);
+                int xB = util.toUInt8(data[multiplier*j+i+3]);
+                int xA = 0;
+                if (png.colorType() == ColorType.GRAYSCALE_ALPHA || png.colorType() == ColorType.RGB_ALPHA) {
+                    xA = util.toUInt8(data[multiplier*j+i+4]);
+                } 
                 int aR = 0;
                 int aG = 0;
                 int aB = 0;
@@ -129,7 +139,7 @@ public class PNGReader { // todo read other color types than rgb alpha also gamm
         return switch(png.colorType()) {
             case GRAYSCALE -> new Pixel(gray, x, y);
             case GRAYSCALE_ALPHA -> new Pixel(gray, grayAlpha, x, y);
-            case PALETTE -> new Pixel(0, 0, 0, 0, 0, indexedColor, x, y);
+            case PALETTE -> new Pixel(0, 255, 0, 0, 0, indexedColor, x, y);
             case RGB -> new Pixel(red, green, blue, x, y);
             case RGB_ALPHA -> new Pixel(red, green, blue, alpha, x, y);
         };

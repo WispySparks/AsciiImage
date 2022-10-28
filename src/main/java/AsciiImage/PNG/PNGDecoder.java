@@ -28,6 +28,7 @@ public class PNGDecoder {
     private int filter; 
     private int interlace;
     private double gamma; 
+    private int renderIntent;
     private Chromaticities chromaticities; 
     private List<Integer> backgroundColor = new ArrayList<>();
     private PixelDimensions pixelDimensions; 
@@ -52,7 +53,7 @@ public class PNGDecoder {
             data[i] = imageData.get(i);
         }
         return new PNG(false, width, height, bitDepth, colorType, compression, 
-        filter, interlace, gamma, chromaticities, backgroundColor, pixelDimensions,
+        filter, interlace, gamma, renderIntent, chromaticities, backgroundColor, pixelDimensions,
         util.decompress(data));
     }
 
@@ -69,7 +70,7 @@ public class PNGDecoder {
             case "cHRM" -> readcHRM(stream); 
             case "gAMA" -> readgAMA(stream); 
             // case "iCCP" -> 
-            // case "sRGB" -> 
+            case "sRGB" -> readsRGB(stream);
             // case "PLTE" ->  // Critical, Optional
             case "bKGD" -> readbKGD(stream); 
             // case "tRNS" -> 
@@ -154,6 +155,10 @@ public class PNGDecoder {
         gamma = stream.readInt() / PNG.gammaFactor;
     }
 
+    private void readsRGB(FileImageInputStream stream) throws IOException {
+        renderIntent = stream.read();
+    }
+
     private void readbKGD(FileImageInputStream stream) throws IOException {
         switch (colorType) {
             case PALETTE -> backgroundColor.add(stream.read()); 
@@ -176,14 +181,15 @@ public class PNGDecoder {
 
     private void reset() {
         finished = false;
-        width = -1;
-        height = -1;
-        bitDepth = -1;
+        width = 0;
+        height = 0;
+        bitDepth = 0;
         colorType = ColorType.GRAYSCALE;
-        compression = -1;
-        filter = -1;
-        interlace = -1;
-        gamma = -1;
+        compression = 0;
+        filter = 0;
+        interlace = 0;
+        gamma = 0;
+        renderIntent = 0;
         chromaticities = new Chromaticities();
         pixelDimensions = new PixelDimensions();
         backgroundColor.clear();    

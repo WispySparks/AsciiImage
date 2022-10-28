@@ -16,13 +16,14 @@ public record PNG(
     int interlaceMethod, // Valid values are 0 or 1
     
     double gamma, // gAMA
+    int renderIntent, // sRGB, valid values are 0, 1, 2, or 3
     Chromaticities chromaticities, // cHRM
     List<Integer> backgroundColor, // bKGD
     PixelDimensions pixelDimensions, // pHYs
     byte[] imageData // IDAT, uncompressed
 
 ) {
-    public static int gammaFactor = 100000;
+    public static double gammaFactor = 100000;
 
     public enum ColorType {
         GRAYSCALE, // 0
@@ -43,7 +44,7 @@ public record PNG(
     int blueY
     ) {
         Chromaticities() {
-            this(-1, -1, -1, -1, -1, -1, -1, -1);
+            this(0, 0, 0, 0, 0, 0, 0, 0);
         }
     }
 
@@ -53,12 +54,12 @@ public record PNG(
     int unitSpecifer // 0 is unknown, 1 is meter
     ) {
         PixelDimensions() {
-            this(-1, -1, -1);
+            this(0, 0, 0);
         }
     }
 
     PNG() {
-        this(true, -1, -1, -1, ColorType.GRAYSCALE, -1, -1, -1, -1, new Chromaticities(-1, -1, -1, -1, -1, -1, -1, -1),
-        new ArrayList<Integer>(), new PixelDimensions(-1, -1, -1), new byte[0]);
+        this(true, 0, 0, 0, ColorType.GRAYSCALE, 0, 0, 0, 0, 0, new Chromaticities(),
+        new ArrayList<Integer>(0), new PixelDimensions(), new byte[0]);
     }
 }

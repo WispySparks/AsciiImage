@@ -4,9 +4,8 @@ import main.java.AsciiImage.PNG.PNG.ColorType;
 import main.java.AsciiImage.Util.ArrayList2D;
 import main.java.AsciiImage.Util.PNGUtil;
 
-public class PNGReader { // todo read other color types than rgb alpha also gamma/color, looks like we can ignore bKGD
+public class PNGReader {
     
-    private PNGUtil util = new PNGUtil();
     private PNG png;
     private byte[] data;
     private int lineLength;
@@ -41,12 +40,12 @@ public class PNGReader { // todo read other color types than rgb alpha also gamm
         for (int i = 0; i < data.length; i += lineLength) { // go through every scan line's first byte to see the filter
             int currentLine = i/lineLength;
             for (int j = 0; j<png.width(); j++) {
-                int xR = util.toUInt8(data[multiplier*j+i+1]);
-                int xG = util.toUInt8(data[multiplier*j+i+2]);
-                int xB = util.toUInt8(data[multiplier*j+i+3]);
+                int xR = PNGUtil.toUInt8(data[multiplier*j+i+1]);
+                int xG = PNGUtil.toUInt8(data[multiplier*j+i+2]);
+                int xB = PNGUtil.toUInt8(data[multiplier*j+i+3]);
                 int xA = 0;
                 if (png.colorType() == ColorType.GRAYSCALE_ALPHA || png.colorType() == ColorType.RGB_ALPHA) {
-                    xA = util.toUInt8(data[multiplier*j+i+4]);
+                    xA = PNGUtil.toUInt8(data[multiplier*j+i+4]);
                 } 
                 int aR = 0;
                 int aG = 0;

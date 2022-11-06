@@ -15,6 +15,9 @@ public record PNG(
     int filterMethod, // Valid values are 0
     int interlaceMethod, // Valid values are 0 or 1
     
+    List<Integer> PLTEPalette, // PLTE entries storing rgb as a single integer
+    List<Integer> transparency, // tRNS, length varies by colorType
+    byte[] iccProfile, // iCC profile, uncompressed
     double gamma, // gAMA
     int renderIntent, // sRGB, valid values are 0, 1, 2, or 3
     Chromaticities chromaticities, // cHRM
@@ -59,7 +62,7 @@ public record PNG(
     }
 
     PNG() {
-        this(true, 0, 0, 0, ColorType.GRAYSCALE, 0, 0, 0, 0, 0, new Chromaticities(),
-        new ArrayList<Integer>(0), new PixelDimensions(), new byte[0]);
+        this(true, 0, 0, 0, ColorType.GRAYSCALE, 0, 0, 0, new ArrayList<Integer>(0), new ArrayList<Integer>(0), new byte[0], 0, 0, 
+        new Chromaticities(), new ArrayList<Integer>(0), new PixelDimensions(), new byte[0]);
     }
 }

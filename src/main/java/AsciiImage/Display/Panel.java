@@ -20,7 +20,7 @@ public class Panel extends JPanel {
         pixels = reader.parseImageData();
     }
 
-    public void paint(Graphics g) { // todo resize png so that it fits on screen
+    public void paint(Graphics g) {
         for (Pixel p : pixels.toSingleList()) {
             // int gray = Math.round((p.R() + p.G() + p.B()) / 3);
             // Color c = new Color(gray, gray, gray);

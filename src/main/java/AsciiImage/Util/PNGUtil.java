@@ -2,16 +2,17 @@ package main.java.AsciiImage.Util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.zip.InflaterInputStream;
 
-public class PNGUtil {
+public final class PNGUtil {
 
     /**
      * Converts a signed byte to an unsigned byte
      * @param a byte to convert
      * @return an unsigned byte (int)
      */
-    public int toUInt8(byte a) {
+    public static int toUInt8(byte a) {
         return a & 0xff;
     }
 
@@ -21,7 +22,7 @@ public class PNGUtil {
      * @param b LSB
      * @return a 16 bit unsigned int
      */
-    public int toUInt16(byte a, byte b) {
+    public static int toUInt16(byte a, byte b) {
         return toUInt8(a) << 8 | toUInt8(b);
     }
 
@@ -32,7 +33,7 @@ public class PNGUtil {
      * @param c LSB
      * @return a 24 bit unsigned int
      */
-    public int toUInt24(byte a, byte b, byte c) {
+    public static int toUInt24(byte a, byte b, byte c) {
         return toUInt16(a, b) << 8 | toUInt8(c);
     }
 
@@ -44,11 +45,19 @@ public class PNGUtil {
      * @param d LSB
      * @return a 32 bit unsigned int
      */
-    public int toUInt32(byte a, byte b, byte c, byte d) { // Tested, seems to work
+    public static int toUInt32(byte a, byte b, byte c, byte d) { // Tested, seems to work
         return toUInt24(a, b, c) << 8 | toUInt8(d);
     }
 
-    public byte[] decompress(byte[] data) {
+    public static <T> T[] listToArray(List<T> list) {
+        T[] arr = (T[]) new Object[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            arr[i] = list.get(i);
+        }
+        return arr;
+    }
+
+    public static byte[] decompress(byte[] data) {
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
         InflaterInputStream inflate = new InflaterInputStream(stream);
         byte[] stuff = {};
@@ -85,7 +94,7 @@ public class PNGUtil {
       should be initialized to all 1's, and the transmitted value
       is the 1's complement of the final running CRC (see the
       crc() routine below). */
-    private long updateCRC(long crc, byte[] buf, int len) {
+    private static long updateCRC(long crc, byte[] buf, int len) {
         long c = crc;
         int n;
         for (n = 0; n < len; n++) {
@@ -95,7 +104,7 @@ public class PNGUtil {
     }
 
     // Return the CRC of the bytes buf
-    public long crc(byte[] buf) {
+    public static long crc(byte[] buf) {
         return updateCRC(0xffffffffL, buf, buf.length) ^ 0xffffffffL;
     }
 

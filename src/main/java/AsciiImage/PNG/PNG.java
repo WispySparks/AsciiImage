@@ -16,14 +16,15 @@ public record PNG(
     int interlaceMethod, // Valid values are 0 or 1
     
     List<Integer> PLTEPalette, // PLTE entries storing rgb as a single integer
+    byte[] imageData, // IDAT, uncompressed
     List<Integer> transparency, // tRNS, length varies by colorType
-    byte[] iccProfile, // iCC profile, uncompressed
-    double gamma, // gAMA
-    int renderIntent, // sRGB, valid values are 0, 1, 2, or 3
     Chromaticities chromaticities, // cHRM
+    double gamma, // gAMA
+    byte[] iccProfile, // iCCP, iCC profile, uncompressed
+    List<Integer> significantBits, // sBIT
+    int renderIntent, // sRGB, valid values are 0, 1, 2, or 3
     List<Integer> backgroundColor, // bKGD
-    PixelDimensions pixelDimensions, // pHYs
-    byte[] imageData // IDAT, uncompressed
+    PixelDimensions pixelDimensions // pHYs
 
 ) {
     public static double gammaFactor = 100000;
@@ -62,7 +63,7 @@ public record PNG(
     }
 
     PNG() {
-        this(true, 0, 0, 0, ColorType.GRAYSCALE, 0, 0, 0, new ArrayList<Integer>(0), new ArrayList<Integer>(0), new byte[0], 0, 0, 
-        new Chromaticities(), new ArrayList<Integer>(0), new PixelDimensions(), new byte[0]);
+        this(true, 0, 0, 0, ColorType.GRAYSCALE, 0, 0, 0, new ArrayList<Integer>(0), new byte[0], new ArrayList<Integer>(0), 
+        new Chromaticities(), 0, new byte[0], new ArrayList<Integer>(0), 0, new ArrayList<Integer>(0), new PixelDimensions());
     }
 }

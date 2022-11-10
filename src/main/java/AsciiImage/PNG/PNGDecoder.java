@@ -16,25 +16,27 @@ import main.java.AsciiImage.PNG.PNG.PixelDimensions;
 import main.java.AsciiImage.Util.AsciiTable;
 import main.java.AsciiImage.Util.PNGUtil;
 
-public class PNGDecoder {
+public class PNGDecoder { //! sBIT
 
-    private boolean finished;
-    private int width; 
-    private int height; 
-    private int bitDepth; 
-    private ColorType colorType;
-    private int compression; 
-    private int filter; 
-    private int interlace;
-    private List<Integer> plteEntries = new ArrayList<>();
-    private List<Integer> transparencyValues = new ArrayList<>();
-    private List<Byte> iccProfile = new ArrayList<>();
-    private double gamma; 
-    private int renderIntent;
-    private Chromaticities chromaticities; 
-    private List<Integer> backgroundColor = new ArrayList<>();
-    private PixelDimensions pixelDimensions; 
-    private List<Byte> imageData = new ArrayList<>(); 
+    private int currentChunk = 0;
+    private boolean finished; // IEND
+    private int width; // IHDR
+    private int height; // IHDR 
+    private int bitDepth; // IHDR 
+    private ColorType colorType; // IHDR
+    private int compression; // IHDR 
+    private int filter; // IHDR 
+    private int interlace; // IHDR
+    private List<Integer> PLTEPalette = new ArrayList<>(); // PLTE
+    private List<Byte> imageData = new ArrayList<>(); // IDAT
+    private List<Integer> transparency = new ArrayList<>(); // tRNS
+    private Chromaticities chromaticities; // cHRM
+    private double gamma; // gAMA
+    private List<Byte> iccProfile = new ArrayList<>(); // iCCP
+    private List<Integer> significantBits = new ArrayList<>(); // sBIT
+    private int renderIntent; // sRGB
+    private List<Integer> backgroundColor = new ArrayList<>(); // bKGD
+    private PixelDimensions pixelDimensions; // pHYs
 
     public PNG readPNG(File pngFile) { 
         reset();
@@ -49,14 +51,11 @@ public class PNGDecoder {
             e.printStackTrace();
             return new PNG();
         }
-        byte[] data = PNGUtil.listToArray(imageData);
-        byte[] iccp = new byte[iccProfile.size()];
-        for (int i = 0; i < iccProfile.size(); i++) {
-            iccp[i] = iccProfile.get(i);
-        }
+        byte[] data = PNGUtil.decompress(PNGUtil.listToByteArray(imageData));
+        byte[] iccp = PNGUtil.decompress(PNGUtil.listToByteArray(iccProfile));
         return new PNG(false, width, height, bitDepth, colorType, compression, 
-        filter, interlace, plteEntries, transparencyValues, PNGUtil.decompress(iccp), gamma, renderIntent, chromaticities, backgroundColor, pixelDimensions,
-        PNGUtil.decompress(data));
+        filter, interlace, PLTEPalette, data, transparency, chromaticities, gamma, iccp, significantBits, renderIntent,
+        backgroundColor, pixelDimensions);
     }
 
     private void readNextChunk(FileImageInputStream stream) throws IOException { // reads the next chunk in the image byte stream
@@ -68,28 +67,30 @@ public class PNGDecoder {
             int charVal = typeBytes[i];
             type += AsciiTable.decimalToAscii(charVal);
         }
+        if (currentChunk == 0 && type != "IHDR") throw new StreamCorruptedException("Header Chunk Missing");
         switch (type) {
-            case "IHDR" -> readIHDR(stream, length, type); // Critical
+            case "IHDR" -> readIHDR(stream, length); // Critical
             case "PLTE" -> readPLTE(stream, length); // Critical, Optional
             case "IDAT" -> readIDAT(length, stream);  // Critical
             case "IEND" -> readIEND();  // Critical
             case "tRNS" -> readtRNS(stream, length);
             case "cHRM" -> readcHRM(stream); 
             case "gAMA" -> readgAMA(stream); 
-            case "iCCP" -> readiCCP(stream);
-            // case sBIT -> readsBIT(stream);
+            case "iCCP" -> readiCCP(stream, length);
+            case "sBIT" -> readsBIT(stream);
             case "sRGB" -> readsRGB(stream);
-            // case "iTXt" -> readiTXt(stream); compressed text
-            // case "tEXt" -> readtEXt(stream); text
-            // case "zTXt" -> readzTXt(stream); utf 8 text
+            // case "iTXt" -> readiTXt(stream); 
+            // case "tEXt" -> readtEXt(stream); 
+            // case "zTXt" -> readzTXt(stream); 
             case "bKGD" -> readbKGD(stream); 
             // case "hIST" -> readhIST(stream);
             case "pHYs" -> readpHYs(stream); 
             // case "sPLT" -> readsPLT(stream);
-            // case "tIME" -> readtIME(stream); time last modified
+            // case "tIME" -> readtIME(stream); 
             default -> stream.skipBytes(length); 
         }
         stream.skipBytes(4); // crc
+        currentChunk++;
     }
 
     private void readPNGSignature(FileImageInputStream stream) throws IOException {
@@ -99,9 +100,8 @@ public class PNGDecoder {
         }
     }
 
-    private void readIHDR(FileImageInputStream stream, int length, String type) throws IOException {
+    private void readIHDR(FileImageInputStream stream, int length) throws IOException {
         if (length != 13) throw new StreamCorruptedException("Header Chunk Length Incorrect");
-        if (!type.equals("IHDR")) throw new StreamCorruptedException("Header Chunk Missing");
         byte[] data = new byte[13];
         stream.readFully(data);
         byte[] bWidth = new byte[4];
@@ -131,7 +131,7 @@ public class PNGDecoder {
             int r = stream.read();
             int rg = (r << 8) + stream.read();
             int rgb = (rg << 8) + stream.read();
-            plteEntries.add(rgb);
+            PLTEPalette.add(rgb);
         }
     }
 
@@ -150,16 +150,17 @@ public class PNGDecoder {
     private void readtRNS(FileImageInputStream stream, int length) throws IOException {
         switch(colorType) {
             case GRAYSCALE:
-                transparencyValues.add(PNGUtil.toUInt16(stream.readByte(), stream.readByte())); // gray
+                transparency.add(PNGUtil.toUInt16(stream.readByte(), stream.readByte())); // gray
+                break;
             case PALETTE:
                 for (int i = 0; i < length; i++) {
-                    transparencyValues.add(stream.read());
+                    transparency.add(stream.read());
                 }
                 break;
             case RGB:
-                transparencyValues.add(PNGUtil.toUInt16(stream.readByte(), stream.readByte())); // r
-                transparencyValues.add(PNGUtil.toUInt16(stream.readByte(), stream.readByte())); // g
-                transparencyValues.add(PNGUtil.toUInt16(stream.readByte(), stream.readByte())); // b
+                transparency.add(PNGUtil.toUInt16(stream.readByte(), stream.readByte())); // r
+                transparency.add(PNGUtil.toUInt16(stream.readByte(), stream.readByte())); // g
+                transparency.add(PNGUtil.toUInt16(stream.readByte(), stream.readByte())); // b
                 break;
             default:
         }
@@ -181,8 +182,32 @@ public class PNGDecoder {
         gamma = stream.readInt() / PNG.gammaFactor;
     }
 
-    private void readiCCP(FileImageInputStream stream) throws IOException {
+    private void readiCCP(FileImageInputStream stream, int length) throws IOException {
+        String profileName = "";
+        for (int i = 0; i < 79; i++) {
+            int character = stream.read();
+            if (character == 0) break;
+            profileName += AsciiTable.decimalToAscii(character);
+        }
+        if (stream.read() == 0) {
+            for (int i = 0; i < length-profileName.length()-2; i++) {
+                iccProfile.add(stream.readByte());
+            }
+        }
+    }
 
+    private void readsBIT(FileImageInputStream stream) throws IOException {
+        switch(colorType) {
+            case GRAYSCALE:
+                break;
+            case RGB:
+            case PALETTE:
+                break;
+            case GRAYSCALE_ALPHA:
+                break;
+            case RGB_ALPHA:
+                break;
+        }
     }
 
     private void readsRGB(FileImageInputStream stream) throws IOException {
@@ -210,6 +235,7 @@ public class PNGDecoder {
     }
 
     private void reset() {
+        currentChunk = 0;
         finished = false;
         width = 0;
         height = 0;
@@ -218,14 +244,15 @@ public class PNGDecoder {
         compression = 0;
         filter = 0;
         interlace = 0;
-        plteEntries.clear();
-        transparencyValues.clear();
-        iccProfile.clear();
-        gamma = 0;
-        renderIntent = 0;
-        chromaticities = new Chromaticities();
-        pixelDimensions = new PixelDimensions();
-        backgroundColor.clear();    
+        PLTEPalette.clear();
         imageData.clear();
+        transparency.clear();
+        chromaticities = new Chromaticities();
+        gamma = 0;
+        iccProfile.clear();
+        significantBits.clear();
+        renderIntent = 0;
+        backgroundColor.clear();
+        pixelDimensions = new PixelDimensions();
     }
 }

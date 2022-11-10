@@ -49,10 +49,10 @@ public final class PNGUtil {
         return toUInt24(a, b, c) << 8 | toUInt8(d);
     }
 
-    public static <T> T[] listToArray(List<T> list) {
-        T[] arr = (T[]) new Object[list.size()];
+    public static <T extends Number> byte[] listToByteArray(List<T> list) {
+        byte[] arr = new byte[list.size()];
         for (int i = 0; i < list.size(); i++) {
-            arr[i] = list.get(i);
+            arr[i] = list.get(i).byteValue();
         }
         return arr;
     }
@@ -61,10 +61,12 @@ public final class PNGUtil {
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
         InflaterInputStream inflate = new InflaterInputStream(stream);
         byte[] stuff = {};
-        try {
-            stuff = inflate.readAllBytes();
-            inflate.close();
-        } catch (IOException e) {e.printStackTrace();}
+        if (data.length > 0) {
+            try {
+                stuff = inflate.readAllBytes();
+                inflate.close();
+            } catch (IOException e) {e.printStackTrace();}
+        }
         return stuff;
     }
     

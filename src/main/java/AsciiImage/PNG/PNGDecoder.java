@@ -67,7 +67,7 @@ public class PNGDecoder { //! sBIT
             int charVal = typeBytes[i];
             type += AsciiTable.decimalToAscii(charVal);
         }
-        if (currentChunk == 0 && type != "IHDR") throw new StreamCorruptedException("Header Chunk Missing");
+        if (currentChunk == 0 && !type.equals("IHDR")) throw new StreamCorruptedException("Header Chunk Missing");
         switch (type) {
             case "IHDR" -> readIHDR(stream, length); // Critical
             case "PLTE" -> readPLTE(stream, length); // Critical, Optional
@@ -255,4 +255,5 @@ public class PNGDecoder { //! sBIT
         backgroundColor.clear();
         pixelDimensions = new PixelDimensions();
     }
+    
 }

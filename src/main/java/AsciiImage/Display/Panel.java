@@ -3,6 +3,7 @@ package main.java.AsciiImage.Display;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.plaf.FontUIResource;
@@ -10,7 +11,7 @@ import javax.swing.plaf.FontUIResource;
 import main.java.AsciiImage.PNG.PNG;
 import main.java.AsciiImage.PNG.PNGReader;
 import main.java.AsciiImage.PNG.Pixel;
-import main.java.AsciiImage.Util.ArrayList2D;
+import main.java.AsciiImage.Util.DumpFile;
 
 public class Panel extends JPanel {
 
@@ -18,24 +19,31 @@ public class Panel extends JPanel {
     private final String[] charactersInv = {" ","_",".",",","=","+",";","?","0","$","#","@"};
     private final int charSize = 4;
     private PNGReader reader;
-    private ArrayList2D<Pixel> pixels;
+    private List<Pixel> pixels;
     public boolean inverted = false;
     public boolean ascii = true;
+    private int prevY = 0;
     
     Panel(PNG png) {
         reader = new PNGReader(png);
-        pixels = reader.parseImageData();
+        pixels = reader.parseImageData().toSingleList();
     }
 
     public void paint(Graphics g) {
         String[] chars = inverted ? charactersInv : characters;
         g.setFont(new FontUIResource(Font.SANS_SERIF, Font.PLAIN, charSize));
-        for (Pixel p : pixels.toSingleList()) {
+        DumpFile file = new DumpFile();
+
+        for (Pixel p : pixels) {
             if (ascii) {
                 int gray = Math.round((p.R() + p.G() + p.B()) / 3);
                 Color c = new Color(gray, gray, gray);
                 if (p.X() % charSize == 0 && p.Y() % charSize == 0) {
-                    g.drawString(chars[(int) Math.round((double) c.getRed()*((chars.length-1)/255.0))], p.X(), p.Y());
+                    String character = chars[(int) Math.round((double) c.getRed()*((chars.length-1)/255.0))];
+                    g.drawString(character, p.X(), p.Y());
+                    boolean nl = (prevY < p.Y());
+                    file.write(character, nl);
+                    prevY = p.Y();
                 }
             } else {
                 Color c = new Color(p.R(), p.G(), p.B(), p.A());
@@ -43,6 +51,7 @@ public class Panel extends JPanel {
                 g.fillRect(p.X(), p.Y(), 1, 1);
             }
         }
+        file.close();
     }
-
+    
 }

@@ -16,7 +16,7 @@ import main.java.AsciiImage.PNG.PNG.PixelDimensions;
 import main.java.AsciiImage.Util.AsciiTable;
 import main.java.AsciiImage.Util.PNGUtil;
 
-public class PNGDecoder { //! sBIT
+public class PNGDecoder { 
 
     private int currentChunk = 0;
     private boolean finished; // IEND
@@ -77,7 +77,7 @@ public class PNGDecoder { //! sBIT
             case "cHRM" -> readcHRM(stream); 
             case "gAMA" -> readgAMA(stream); 
             case "iCCP" -> readiCCP(stream, length);
-            case "sBIT" -> readsBIT(stream);
+            // case "sBIT" -> readsBIT(stream);
             case "sRGB" -> readsRGB(stream);
             // case "iTXt" -> readiTXt(stream); 
             // case "tEXt" -> readtEXt(stream); 
@@ -195,7 +195,7 @@ public class PNGDecoder { //! sBIT
             }
         }
     }
-
+    @SuppressWarnings("unused")
     private void readsBIT(FileImageInputStream stream) throws IOException {
         switch(colorType) {
             case GRAYSCALE:

@@ -16,7 +16,7 @@ public class Panel extends JPanel {
 
     private final String[] characters = {"@","#","$","0","?",";","+","=",",",".","_"," "};
     private final String[] charactersInv = {" ","_",".",",","=","+",";","?","0","$","#","@"};
-    private final int charSize = 8;
+    private final int charSize = 4;
     private PNGReader reader;
     private ArrayList2D<Pixel> pixels;
     public boolean inverted = false;

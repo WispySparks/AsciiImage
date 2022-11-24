@@ -3,3 +3,4 @@
 bin
 *Bundle/
 *.jar
+dump.txt

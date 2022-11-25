@@ -1,4 +1,4 @@
-package main.java.AsciiImage.PNG;
+package AsciiImage.PNG;
 
 import java.util.ArrayList;
 import java.util.List;

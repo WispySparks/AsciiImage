@@ -1,9 +1,9 @@
-package main.java.AsciiImage.Display;
+package AsciiImage.Display;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-import main.java.AsciiImage.PNG.PNG;
+import AsciiImage.PNG.PNG;
 
 public class Frame extends JFrame {
     

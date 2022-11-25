@@ -4,3 +4,7 @@ bin
 *Bundle/
 *.jar
 dump.txt
+
+# Gradle
+.gradle
+build

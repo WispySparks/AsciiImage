@@ -1,4 +1,4 @@
-package main.java.AsciiImage.Display;
+package AsciiImage.Display;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -8,10 +8,9 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.plaf.FontUIResource;
 
-import main.java.AsciiImage.PNG.PNG;
-import main.java.AsciiImage.PNG.PNGReader;
-import main.java.AsciiImage.PNG.Pixel;
-import main.java.AsciiImage.Util.DumpFile;
+import AsciiImage.PNG.PNG;
+import AsciiImage.PNG.PNGReader;
+import AsciiImage.PNG.Pixel;
 
 public class Panel extends JPanel {
 
@@ -22,7 +21,7 @@ public class Panel extends JPanel {
     private List<Pixel> pixels;
     public boolean inverted = false;
     public boolean ascii = true;
-    private int prevY = 0;
+    // private int prevY = 0;
     
     Panel(PNG png) {
         reader = new PNGReader(png);
@@ -32,7 +31,7 @@ public class Panel extends JPanel {
     public void paint(Graphics g) {
         String[] chars = inverted ? charactersInv : characters;
         g.setFont(new FontUIResource(Font.SANS_SERIF, Font.PLAIN, charSize));
-        DumpFile file = new DumpFile();
+        // DumpFile file = new DumpFile();
 
         for (Pixel p : pixels) {
             if (ascii) {
@@ -41,9 +40,9 @@ public class Panel extends JPanel {
                 if (p.X() % charSize == 0 && p.Y() % charSize == 0) {
                     String character = chars[(int) Math.round((double) c.getRed()*((chars.length-1)/255.0))];
                     g.drawString(character, p.X(), p.Y());
-                    boolean nl = (prevY < p.Y());
-                    file.write(character, nl);
-                    prevY = p.Y();
+                    // boolean nl = (prevY < p.Y());
+                    // file.write(character, nl);
+                    // prevY = p.Y();
                 }
             } else {
                 Color c = new Color(p.R(), p.G(), p.B(), p.A());
@@ -51,7 +50,7 @@ public class Panel extends JPanel {
                 g.fillRect(p.X(), p.Y(), 1, 1);
             }
         }
-        file.close();
+        // file.close();
     }
     
 }

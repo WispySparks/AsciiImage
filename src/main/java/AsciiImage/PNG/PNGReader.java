@@ -1,8 +1,8 @@
-package main.java.AsciiImage.PNG;
+package AsciiImage.PNG;
 
-import main.java.AsciiImage.PNG.PNG.ColorType;
-import main.java.AsciiImage.Util.ArrayList2D;
-import main.java.AsciiImage.Util.PNGUtil;
+import AsciiImage.PNG.PNG.ColorType;
+import AsciiImage.Util.ArrayList2D;
+import AsciiImage.Util.PNGUtil;
 
 public class PNGReader {
     

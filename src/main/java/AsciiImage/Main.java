@@ -1,10 +1,10 @@
-package main.java.AsciiImage;
+package AsciiImage;
 
 import java.io.File;
 
-import main.java.AsciiImage.Display.Frame;
-import main.java.AsciiImage.PNG.PNG;
-import main.java.AsciiImage.PNG.PNGDecoder;
+import AsciiImage.Display.Frame;
+import AsciiImage.PNG.PNG;
+import AsciiImage.PNG.PNGDecoder;
 
 public class Main { // todo resize png so that it fits on screen, dump text file(top line is broken), javafx, zoom in?
     public static void main(String[] args) { 

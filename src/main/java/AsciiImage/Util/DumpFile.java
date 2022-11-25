@@ -1,4 +1,4 @@
-package main.java.AsciiImage.Util;
+package AsciiImage.Util;
 
 import java.io.File;
 import java.io.FileWriter;

@@ -1,10 +1,15 @@
-# ignore unneeded folders and jar setup
-.vscode
-bin
+# JarScript
 *Bundle/
 *.jar
-dump.txt
 
 # Gradle
 .gradle
 build
+
+# VSCode
+.vscode
+bin
+
+# testing
+*.txt
+!LICENSE.txt

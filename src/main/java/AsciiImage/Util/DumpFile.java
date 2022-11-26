@@ -6,21 +6,16 @@ import java.io.IOException;
 
 public class DumpFile {
     
-    private File file = new File("dump.txt");
     private FileWriter writer;
+    private File file;
 
-    public DumpFile() {
-        try {
-            file.delete();
-            file.createNewFile();
-            writer = new FileWriter(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public DumpFile(String name) {
+        file = new File(name + ".txt");
     }
 
     public void write(String s, boolean newLine) {
         try {
+            if (writer == null) writer = new FileWriter(file);
             if (newLine) writer.write(System.lineSeparator());
             writer.write(s);
         } catch (IOException e) {
@@ -29,11 +24,23 @@ public class DumpFile {
     }
 
     public void close() {
+        if (writer == null) return;
         try {
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String removeFileExt(String fileName) {
+        String name = "";
+        String[] arr = fileName.split("\\.");
+        for (int i = 0; i < arr.length; i++) {
+            if (i != arr.length-1) {
+                name += arr[i];
+            }
+        }
+        return name;
     }
 
 }

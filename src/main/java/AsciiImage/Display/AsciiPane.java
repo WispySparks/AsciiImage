@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import AsciiImage.PNG.Pixel;
+import AsciiImage.Util.DumpFile;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -16,15 +17,15 @@ public class AsciiPane extends Pane {
     private Supplier<List<Pixel>> pixels;
     private int charSize = 4;
     private boolean inverted = false;
+    private int prevY = 0;
 
     public AsciiPane(Supplier<List<Pixel>> supplier) {
         pixels = supplier;
     }
 
-    public void drawAscii() {
+    public void drawAscii(DumpFile file, boolean createFile) {
         getChildren().clear();
         String[] chars = inverted ? charactersInv : characters;
-        // DumpFile file = new DumpFile();
         for (Pixel p : pixels.get()) {
             int gray = Math.round((p.R() + p.G() + p.B()) / 3);
             Color c = Color.grayRgb(gray);
@@ -34,12 +35,14 @@ public class AsciiPane extends Pane {
                 label.setFont(new Font("SansSerif", charSize));
                 label.relocate(p.X(), p.Y());
                 getChildren().add(label);
-
-                // boolean nl = (prevY < p.Y());
-                // file.write(character, nl);
-                // prevY = p.Y();
+                if (createFile) {
+                    boolean nl = (prevY < p.Y());
+                    file.write(character, nl);
+                    prevY = p.Y();
+                }
             }
         }
+        file.close();
     }
 
 }

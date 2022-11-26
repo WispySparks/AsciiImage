@@ -1,20 +1,21 @@
 package AsciiImage;
 
-import java.io.File;
+import AsciiImage.Display.BasePane;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-import AsciiImage.Display.Frame;
-import AsciiImage.PNG.PNG;
-import AsciiImage.PNG.PNGDecoder;
-
-public class Main { // todo resize png so that it fits on screen, dump text file(top line is broken), javafx, zoom in?
+public class Main extends Application { // todo resize png so that it fits on screen, dump text file(top line is broken), javafx, zoom in?
     public static void main(String[] args) { 
-        File file = new File("C:\\Users\\wispy\\Downloads\\celeste.png"); // RGBA
-        // File file = new File("C:\\Users\\wispy\\Pictures\\Saved Pictures\\artemispfp2.png"); // RGBA
-        // File file = new File("C:\\Users\\wispy\\Pictures\\Saved Pictures\\Cypher&Omen.png"); // only filter 0
-        // File file = new File("C:\\Users\\wispy\\Pictures\\Saved Pictures\\artemispfp.png"); // only filter 0
-        // File file = new File("C:\\Users\\wispy\\Pictures\\Saved Pictures\\Overlay.png"); // RGB
-        PNGDecoder decoder = new PNGDecoder();
-        PNG png = decoder.readPNG(file);
-        new Frame(png);
+        launch(args);
     }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        Scene scene = new Scene(new BasePane(stage), 640, 480);
+        stage.setScene(scene);
+        stage.setTitle("PNG to ASCII");
+        stage.show();
+    }
+
 }

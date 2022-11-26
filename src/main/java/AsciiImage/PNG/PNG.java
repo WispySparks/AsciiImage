@@ -62,7 +62,7 @@ public record PNG(
         }
     }
 
-    PNG() {
+    public PNG() {
         this(true, 0, 0, 0, ColorType.GRAYSCALE, 0, 0, 0, new ArrayList<Integer>(0), new byte[0], new ArrayList<Integer>(0), 
         new Chromaticities(), 0, new byte[0], new ArrayList<Integer>(0), 0, new ArrayList<Integer>(0), new PixelDimensions());
     }

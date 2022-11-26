@@ -10,9 +10,8 @@ public class PNGReader {
     private byte[] data;
     private int lineLength;
 
-    public PNGReader(PNG png) {
-        if (png.isCorrupted()) return;
-        this.png = png;
+    private void setup(PNG image) {
+        this.png = image;
         data = png.imageData();
         int bytesPerPixel = switch(png.colorType()) {
             case GRAYSCALE -> 1; // G
@@ -22,13 +21,13 @@ public class PNGReader {
             case RGB_ALPHA -> 4; // R, G, B, A
         };
         lineLength = bytesPerPixel * png.width() + 1;
-        // if (data.length / lineLength == png.height()) System.out.println("HOORAY!"); // something is lining up here
     }
 
     /** 
      * {@link} https://www.w3.org/TR/PNG/#9Filter-types
      */
-    public ArrayList2D<Pixel> parseImageData() {
+    public ArrayList2D<Pixel> parseImageData(PNG image) {
+        setup(image);
         ArrayList2D<Pixel> pixels = new ArrayList2D<>();
         int multiplier = switch (png.colorType()) {
             case GRAYSCALE -> 1;

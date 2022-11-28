@@ -8,9 +8,15 @@ public class DumpFile {
     
     private FileWriter writer;
     private File file;
+    private boolean create = false;
 
     public DumpFile(String name) {
+        this(name, false);
+    }
+
+    public DumpFile(String name, boolean create) {
         file = new File(name + ".txt");
+        this.create = create;
     }
 
     public void write(String s, boolean newLine) {
@@ -41,6 +47,10 @@ public class DumpFile {
             }
         }
         return name;
+    }
+
+    public boolean shouldCreate() {
+        return create;
     }
 
 }

@@ -10,6 +10,7 @@ import javafx.scene.paint.Color;
 
 public class ImageCanvas extends Canvas {
     
+    private PixelWriter pw = getGraphicsContext2D().getPixelWriter();
     private Supplier<List<Pixel>> pixels;
 
     public ImageCanvas(Supplier<List<Pixel>> supplier) {
@@ -21,7 +22,6 @@ public class ImageCanvas extends Canvas {
         getGraphicsContext2D().clearRect(0, 0, getWidth(), getHeight());
         setHeight(height);
         setWidth(width);
-        PixelWriter pw = getGraphicsContext2D().getPixelWriter();
         for (Pixel p : pixels.get()) {
             Color c = Color.rgb(p.R(), p.G(), p.B());
             pw.setColor(p.X(), p.Y(), c);

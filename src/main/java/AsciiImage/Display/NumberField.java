@@ -7,6 +7,10 @@ public class NumberField extends TextField {
 
     protected final static String numberRegex = "^[0-9]*$";
 
+    public NumberField(String number) {
+        super(number);
+    }
+
     @Override
     public void replaceSelection(String replacement) {
         if (replacement.matches(numberRegex)) {
@@ -29,6 +33,7 @@ public class NumberField extends TextField {
     }
 
     public int getValue() {
+        if (getText() == null || getText() == "" || !getText().matches(numberRegex)) return 0;
         return Integer.parseInt(getText());
     }
     

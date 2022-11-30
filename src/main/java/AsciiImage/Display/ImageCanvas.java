@@ -23,7 +23,7 @@ public class ImageCanvas extends Canvas {
         setHeight(height);
         setWidth(width);
         for (Pixel p : pixels.get()) {
-            Color c = Color.rgb(p.R(), p.G(), p.B());
+            Color c = Color.rgb(p.red(), p.green(), p.blue());
             pw.setColor(p.X(), p.Y(), c);
         }
     }

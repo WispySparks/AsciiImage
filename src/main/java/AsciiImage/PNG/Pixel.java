@@ -3,10 +3,10 @@ package AsciiImage.PNG;
 public record Pixel(
 
     int gray, 
-    int A,
-    int R,
-    int G,
-    int B,
+    int alpha,
+    int red,
+    int green,
+    int blue,
     int indexedColor,
     int X,
     int Y

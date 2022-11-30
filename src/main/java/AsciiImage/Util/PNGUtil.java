@@ -60,14 +60,14 @@ public final class PNGUtil {
     public static byte[] decompress(byte[] data) {
         ByteArrayInputStream stream = new ByteArrayInputStream(data);
         InflaterInputStream inflate = new InflaterInputStream(stream);
-        byte[] stuff = {};
+        byte[] decompressedData = {};
         if (data.length > 0) {
             try {
-                stuff = inflate.readAllBytes();
+                decompressedData = inflate.readAllBytes();
                 inflate.close();
             } catch (IOException e) {e.printStackTrace();}
         }
-        return stuff;
+        return decompressedData;
     }
     
     // * https://www.w3.org/TR/2003/REC-PNG-20031110/#D-CRCAppendix

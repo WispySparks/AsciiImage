@@ -63,24 +63,24 @@ public class PNGReader {
 
                 if (j > 0) {
                     Pixel prevP = pixels.get(currentLine, j-1);
-                    aR = prevP.R();
-                    aG = prevP.G();
-                    aB = prevP.B();
-                    aA = prevP.A();
+                    aR = prevP.red();
+                    aG = prevP.green();
+                    aB = prevP.blue();
+                    aA = prevP.alpha();
                 }
                 if (i > 0) {
                     Pixel aboveP = pixels.get(currentLine-1, j);
-                    bR = aboveP.R();
-                    bG = aboveP.G();
-                    bB = aboveP.B();
-                    bA = aboveP.A();
+                    bR = aboveP.red();
+                    bG = aboveP.green();
+                    bB = aboveP.blue();
+                    bA = aboveP.alpha();
                 }
                 if (i > 0 && j > 0) {
                     Pixel diagonalP = pixels.get(currentLine-1, j-1);
-                    cR = diagonalP.R();
-                    cG = diagonalP.G();
-                    cB = diagonalP.B();
-                    cA = diagonalP.A();
+                    cR = diagonalP.red();
+                    cG = diagonalP.green();
+                    cB = diagonalP.blue();
+                    cA = diagonalP.alpha();
                 }
                 switch(data[i]) {
                     case 0:

@@ -3,16 +3,14 @@ package AsciiImage.Util;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Random;
 
 public class DumpFile {
     
     private final File file;
     private FileWriter writer;
-    private Random r = new Random();
 
     public DumpFile(File name) {
-        file = new File(FileUtil.removeFileExt(name) + r.nextInt(1000) + ".txt");
+        file = new File(FileUtil.removeFileExt(name) + (int) System.currentTimeMillis() + ".txt");
     }
 
     public void write(String s) {

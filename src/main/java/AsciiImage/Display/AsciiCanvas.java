@@ -40,7 +40,7 @@ public class AsciiCanvas extends Canvas {
         gc.setFont(font);
         char[] chars = inverted.getAsBoolean() ? charactersInv : characters;
         for (Pixel p : pixels.get()) {
-            int gray = Math.round((p.R() + p.G() + p.B()) / 3);
+            int gray = Math.round((p.red() + p.green() + p.blue()) / 3);
             Color c = Color.grayRgb(gray);
             if (p.X() % size == 0 && p.Y() % size == 0) {
                 String character = String.valueOf(chars[(int) Math.round((double) (c.getRed()*255)*((chars.length-1)/255.0))]);

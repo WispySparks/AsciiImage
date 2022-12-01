@@ -9,8 +9,8 @@ public class DumpFile {
     private final File file;
     private FileWriter writer;
 
-    public DumpFile(File name) {
-        file = new File(FileUtil.removeFileExt(name) + (int) System.currentTimeMillis() + ".txt");
+    public DumpFile(File file) {
+        this.file = file;
     }
 
     public void write(String s) {

@@ -10,7 +10,7 @@ public final class FileUtil {
         if (lastIndex == -1) {
             return "";
         }
-        return name.substring(lastIndex+1);
+        return name.substring(lastIndex+1).toLowerCase();
     }
 
     public static String removeFileExt(File file) {

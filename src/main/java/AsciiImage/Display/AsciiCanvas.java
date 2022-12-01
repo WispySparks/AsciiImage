@@ -31,8 +31,7 @@ public class AsciiCanvas extends Canvas {
     }
 
     public void drawAscii(double height, double width) {
-        currentChars.clear();
-        gc.clearRect(0, 0, getWidth(), getHeight());
+        clearCanvas();
         setHeight(height);
         setWidth(width);
         int size = charSize.getAsInt();
@@ -56,6 +55,13 @@ public class AsciiCanvas extends Canvas {
 
     public List<String> getImageCharacters() {
         return currentChars;
+    }
+
+    public void clearCanvas() {
+        currentChars.clear();
+        gc.clearRect(0, 0, getWidth(), getHeight());
+        setHeight(0);
+        setWidth(0);
     }
 
 }

@@ -33,7 +33,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 
-public class BasePane extends GridPane {
+public class TopPane extends GridPane {
 
     private final FileChooser chooser = new FileChooser();
     private final Stage stage;
@@ -44,9 +44,11 @@ public class BasePane extends GridPane {
     private Label errorLabel = new Label();
     private PNG png = new PNG();
     private List<Pixel> pixels = new ArrayList<>();
+    private Pane centerPane;
     
-    public BasePane(Stage s) {
+    public TopPane(Stage s, Pane center) {
         stage = s;
+        centerPane = center;
         chooser.getExtensionFilters().add(pngFilter);
         setBackground(new Background(new BackgroundFill(Color.rgb(54, 57, 63, 1), null, null)));
         setPadding(new Insets(5, 10, 20, 10));
@@ -70,11 +72,12 @@ public class BasePane extends GridPane {
         ComboBox<String> exportChoices = new ComboBox<>();
         exportChoices.getItems().addAll("Text File", "Image");
         exportChoices.getSelectionModel().selectFirst();
-        ImageCanvas image = new ImageCanvas(() -> pixels);
-        image.setVisible(false);
+        ImageCanvas imageCanvas = new ImageCanvas(() -> pixels);
+        imageCanvas.setVisible(false);
         Pane asciiPane = new Pane();
         asciiPane.setStyle("-fx-background-color: white");
         asciiPane.setVisible(false);
+        asciiPane.setOnScroll((event) -> MouseEvents.zoom(event, asciiPane));
         asciiCanvas = new AsciiCanvas(() -> pixels, () -> invertCB.isSelected(), () -> charField.getValue());
         asciiPane.getChildren().add(asciiCanvas);
         selectB.setOnAction((event) -> { // File Select Button Logic
@@ -93,9 +96,9 @@ public class BasePane extends GridPane {
                     }
                     protected void succeeded() {
                         errorLabel.setText("");
-                        image.drawImage(png.height(), png.width());
+                        imageCanvas.drawImage(png.height(), png.width());
                         asciiCanvas.clearCanvas();
-                        image.setVisible(true);
+                        imageCanvas.setVisible(true);
                         asciiPane.setVisible(false);
                     }
                     protected void failed() {
@@ -116,7 +119,7 @@ public class BasePane extends GridPane {
             if (charField.getValue() != 0) {
                 if (pixels.size() > 0) {
                     asciiCanvas.drawAscii(png.height(), png.width());
-                    image.setVisible(false);
+                    imageCanvas.setVisible(false);
                     asciiPane.setVisible(true);
                     errorLabel.setText("");
                 }
@@ -130,7 +133,7 @@ public class BasePane extends GridPane {
         });
         flipB.setOnAction((event) -> { // Switch Button Logic
             asciiPane.setVisible(!asciiPane.isVisible());
-            image.setVisible(!image.isVisible());
+            imageCanvas.setVisible(!imageCanvas.isVisible());
         });
         exportB.setOnAction((event) -> { // Export Button Logic
             switch(exportChoices.getSelectionModel().getSelectedItem()) {
@@ -139,6 +142,7 @@ public class BasePane extends GridPane {
                 default -> throw new IllegalArgumentException("Export ComboBox invalid selection");
             }
         });
+        centerPane.getChildren().addAll(imageCanvas, asciiPane);
         add(selectB, 0, 0); // Add GUI Elements
         add(convertB, 1, 0);
         add(invertLabel, 2, 0);
@@ -149,8 +153,7 @@ public class BasePane extends GridPane {
         add(exportB, 7, 0);
         add(exportChoices, 8, 0);
         add(errorLabel, 9, 0);
-        add(image, 0, 1, 10, 1);
-        add(asciiPane, 0, 1, 10, 1);
+        add(centerPane, 0, 1, 10, 1);
     }
 
     private void exportTextFile() {

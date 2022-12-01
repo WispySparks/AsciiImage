@@ -13,9 +13,12 @@ public class ImageCanvas extends Canvas {
     private PixelWriter pw = getGraphicsContext2D().getPixelWriter();
     private Supplier<List<Pixel>> pixels;
 
+
     public ImageCanvas(Supplier<List<Pixel>> supplier) {
         super();
         pixels = supplier;
+        setOnScroll((event) -> MouseEvents.zoom(event, this));
+        setOnMouseDragged((event) -> MouseEvents.pan(event, this));
     }
 
     public void drawImage(double height, double width) {

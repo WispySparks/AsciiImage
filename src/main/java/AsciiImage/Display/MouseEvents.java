@@ -25,13 +25,15 @@ public class MouseEvents {
         double deltaY = p1.getY() - p0.getY();
 
         node.setTranslateX(node.getTranslateX() - deltaX);
-        node.setTranslateY(node.getTranslateY() - deltaY);        
+        node.setTranslateY(node.getTranslateY() - deltaY);   
     }
 
-    public static void pan(MouseEvent event, Node node) {
-        System.out.println(event.getX() + " " + event.getY());
-        node.setTranslateX(node.getTranslateX());
-        node.setTranslateY(node.getTranslateY());
+    public static Point2D pan(MouseEvent event, Node node, Point2D startPoint) { 
+        double x = node.getTranslateX() + event.getX() - startPoint.getX();
+        double y = node.getTranslateY() + event.getY() - startPoint.getY();
+        node.setTranslateX(x); 
+        node.setTranslateY(y);
+        return new Point2D(x, y);
     }
 
 }

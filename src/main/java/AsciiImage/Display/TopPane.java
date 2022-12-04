@@ -14,6 +14,7 @@ import AsciiImage.PNG.PNGReader;
 import AsciiImage.PNG.Pixel;
 import AsciiImage.Util.DumpFile;
 import AsciiImage.Util.FileUtil;
+import AsciiImage.Util.Point2DWrapper;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
@@ -47,6 +48,7 @@ public class TopPane extends GridPane {
     private Pane centerPane;
     
     public TopPane(Stage s, Pane center) {
+        super();
         stage = s;
         centerPane = center;
         chooser.getExtensionFilters().add(pngFilter);
@@ -72,14 +74,14 @@ public class TopPane extends GridPane {
         ComboBox<String> exportChoices = new ComboBox<>();
         exportChoices.getItems().addAll("Text File", "Image");
         exportChoices.getSelectionModel().selectFirst();
-        ImageCanvas imageCanvas = new ImageCanvas(() -> pixels);
-        imageCanvas.setVisible(false);
-        Pane asciiPane = new Pane();
-        asciiPane.setStyle("-fx-background-color: white");
-        asciiPane.setVisible(false);
-        asciiPane.setOnScroll((event) -> MouseEvents.zoom(event, asciiPane));
+
+        Point2DWrapper pos = new Point2DWrapper();
+        ImageCanvas imageCanvas = new ImageCanvas(() -> pixels, pos);
+        imageCanvas.setVisibleWithPos(false);
         asciiCanvas = new AsciiCanvas(() -> pixels, () -> invertCB.isSelected(), () -> charField.getValue());
-        asciiPane.getChildren().add(asciiCanvas);
+        AsciiPane asciiPane = new AsciiPane(asciiCanvas, pos);
+        asciiPane.setVisibleWithPos(false);
+
         selectB.setOnAction((event) -> { // File Select Button Logic
             File file;
             chooser.setTitle("Select File");
@@ -98,8 +100,8 @@ public class TopPane extends GridPane {
                         errorLabel.setText("");
                         imageCanvas.drawImage(png.height(), png.width());
                         asciiCanvas.clearCanvas();
-                        imageCanvas.setVisible(true);
-                        asciiPane.setVisible(false);
+                        imageCanvas.setVisibleWithPos(true);
+                        asciiPane.setVisibleWithPos(false);
                     }
                     protected void failed() {
                         if (exceptionProperty().get().getMessage().equals("Corrupted")) {
@@ -119,8 +121,8 @@ public class TopPane extends GridPane {
             if (charField.getValue() != 0) {
                 if (pixels.size() > 0) {
                     asciiCanvas.drawAscii(png.height(), png.width());
-                    imageCanvas.setVisible(false);
-                    asciiPane.setVisible(true);
+                    imageCanvas.setVisibleWithPos(false);
+                    asciiPane.setVisibleWithPos(true);
                     errorLabel.setText("");
                 }
             } else {
@@ -132,8 +134,8 @@ public class TopPane extends GridPane {
             }
         });
         flipB.setOnAction((event) -> { // Switch Button Logic
-            asciiPane.setVisible(!asciiPane.isVisible());
-            imageCanvas.setVisible(!imageCanvas.isVisible());
+            asciiPane.setVisibleWithPos(!asciiPane.isVisible());
+            imageCanvas.setVisibleWithPos(!imageCanvas.isVisible());
         });
         exportB.setOnAction((event) -> { // Export Button Logic
             switch(exportChoices.getSelectionModel().getSelectedItem()) {
@@ -142,6 +144,7 @@ public class TopPane extends GridPane {
                 default -> throw new IllegalArgumentException("Export ComboBox invalid selection");
             }
         });
+
         centerPane.getChildren().addAll(imageCanvas, asciiPane);
         add(selectB, 0, 0); // Add GUI Elements
         add(convertB, 1, 0);

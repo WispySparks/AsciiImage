@@ -18,14 +18,13 @@ public class AsciiCanvas extends Canvas {
     public static final char[] charactersInv = {' ','_','.',',','=','+',';','?','0','$','#','@'};
     private final GraphicsContext gc = getGraphicsContext2D();
     private List<String> currentChars = new ArrayList<>();
-    private Supplier<List<Pixel>> pixels;
+    private Supplier<List<Pixel>> pixelSupplier;
     private IntSupplier charSize;
     private BooleanSupplier inverted;
-    private int prevY = 0;
 
-    public AsciiCanvas(Supplier<List<Pixel>> supplier, BooleanSupplier inv, IntSupplier size) {
+    AsciiCanvas(Supplier<List<Pixel>> supplier, BooleanSupplier inv, IntSupplier size) {
         super();
-        pixels = supplier;
+        pixelSupplier = supplier;
         inverted = inv;
         charSize = size;
     }
@@ -38,17 +37,18 @@ public class AsciiCanvas extends Canvas {
         Font font = Font.font("SansSerif", size);
         gc.setFont(font);
         char[] chars = inverted.getAsBoolean() ? charactersInv : characters;
-        for (Pixel p : pixels.get()) {
+        List<Pixel> pixels = pixelSupplier.get();
+        for (int i = 0; i < pixels.size(); i++) {
+            Pixel p = pixels.get(i);
             int gray = Math.round((p.red() + p.green() + p.blue()) / 3);
             Color c = Color.grayRgb(gray);
             if (p.X() % size == 0 && p.Y() % size == 0) {
                 String character = String.valueOf(chars[(int) Math.round((double) (c.getRed()*255)*((chars.length-1)/255.0))]);
                 if (!character.equals(" ")) gc.fillText(character, p.X(), p.Y());
-                if (prevY < p.Y()) {
+                currentChars.add(character);
+                if (i+size < pixels.size() && p.Y() < pixels.get(i+size).Y()) {
                     currentChars.add(System.lineSeparator());
                 }
-                prevY = p.Y();
-                currentChars.add(character);
             }
         }
     }

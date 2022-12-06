@@ -4,32 +4,38 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import AsciiImage.PNG.Pixel;
-import AsciiImage.Util.Point2DWrapper;
+import AsciiImage.Util.TranslateScale;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Translate;
 
 public class ImageCanvas extends Canvas {
     
     private PixelWriter pw = getGraphicsContext2D().getPixelWriter();
     private Supplier<List<Pixel>> pixels;
     private Point2D clickPoint;
-    private Point2DWrapper pos;
+    private TranslateScale transform;
 
-    public ImageCanvas(Supplier<List<Pixel>> supplier, Point2DWrapper pos) {
+    public ImageCanvas(Supplier<List<Pixel>> supplier, TranslateScale ts) {
         super();
         pixels = supplier;
-        this.pos = pos;
-        pos.setPoint(new Point2D(getTranslateX(), getTranslateY()));
+        transform = ts;
+        transform.setTranslate(new Translate(getTranslateX(), getTranslateY()));
+        transform.setScale(new Scale(getScaleX(), getScaleY()));
         setOnScroll((event) -> {
-            MouseEvents.zoom(event, this);
+            TranslateScale t = MouseEvents.zoom(event, this);
+            transform.setScale(t.getScale());
+            transform.setTranslate(t.getTranslate());
         });
         setOnMousePressed((event) -> {
             clickPoint = new Point2D(event.getX(), event.getY());
         });
         setOnMouseDragged((event) -> {
-            pos.setPoint(MouseEvents.pan(event, this, clickPoint));
+            Point2D point = MouseEvents.pan(event, this, clickPoint);
+            transform.setTranslate(new Translate(point.getX(), point.getY()));
         });
     }
 
@@ -43,9 +49,11 @@ public class ImageCanvas extends Canvas {
         }
     }
 
-    public void setVisibleWithPos(boolean visible) {
-        setTranslateX(pos.getPoint().getX());
-        setTranslateY(pos.getPoint().getY());
+    public void setVisibleWithTransform(boolean visible) {
+        setTranslateX(transform.getTranslate().getX());
+        setTranslateY(transform.getTranslate().getY());
+        setScaleX(transform.getScale().getX());
+        setScaleY(transform.getScale().getY());
         setVisible(visible);
     }
 

@@ -14,7 +14,7 @@ import AsciiImage.PNG.PNGReader;
 import AsciiImage.PNG.Pixel;
 import AsciiImage.Util.DumpFile;
 import AsciiImage.Util.FileUtil;
-import AsciiImage.Util.Point2DWrapper;
+import AsciiImage.Util.TranslateScale;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
@@ -41,7 +41,7 @@ public class TopPane extends GridPane {
     private final PNGReader reader = new PNGReader();
     private final PNGDecoder decoder = new PNGDecoder();
     private final ExtensionFilter pngFilter = new ExtensionFilter("PNG File", "*.png");
-    private AsciiCanvas asciiCanvas;
+    private AsciiPane ascii;
     private Label errorLabel = new Label();
     private PNG png = new PNG();
     private List<Pixel> pixels = new ArrayList<>();
@@ -59,7 +59,7 @@ public class TopPane extends GridPane {
         setup();
     }
 
-    public void setup() { // Create GUI elements and initialize them
+    private void setup() { // Create GUI elements and initialize them
         errorLabel.setTextFill(Color.RED);
         Button selectB = new Button("Select PNG");
         Button convertB = new Button("Convert");
@@ -75,12 +75,11 @@ public class TopPane extends GridPane {
         exportChoices.getItems().addAll("Text File", "Image");
         exportChoices.getSelectionModel().selectFirst();
 
-        Point2DWrapper pos = new Point2DWrapper();
-        ImageCanvas imageCanvas = new ImageCanvas(() -> pixels, pos);
-        imageCanvas.setVisibleWithPos(false);
-        asciiCanvas = new AsciiCanvas(() -> pixels, () -> invertCB.isSelected(), () -> charField.getValue());
-        AsciiPane asciiPane = new AsciiPane(asciiCanvas, pos);
-        asciiPane.setVisibleWithPos(false);
+        TranslateScale tranform = new TranslateScale();
+        ImageCanvas imageCanvas = new ImageCanvas(() -> pixels, tranform);
+        imageCanvas.setVisibleWithTransform(false);
+        ascii = new AsciiPane(() -> pixels, () -> invertCB.isSelected(), () -> charField.getValue(), tranform);
+        ascii.setVisibleWithTransform(false);
 
         selectB.setOnAction((event) -> { // File Select Button Logic
             File file;
@@ -97,19 +96,20 @@ public class TopPane extends GridPane {
                         return null;
                     }
                     protected void succeeded() {
+                        tranform.reset();
                         errorLabel.setText("");
                         imageCanvas.drawImage(png.height(), png.width());
-                        asciiCanvas.clearCanvas();
-                        imageCanvas.setVisibleWithPos(true);
-                        asciiPane.setVisibleWithPos(false);
+                        ascii.getCanvas().clearCanvas();
+                        imageCanvas.setVisibleWithTransform(true);
+                        ascii.setVisibleWithTransform(false);
                     }
                     protected void failed() {
                         if (exceptionProperty().get().getMessage().equals("Corrupted")) {
                             errorLabel.setText("Corrupted PNG");
-                            asciiCanvas.clearCanvas();
+                            ascii.getCanvas().clearCanvas();
                         } else if (exceptionProperty().get().getMessage().equals("Invalid File")) {
                             errorLabel.setText("Invalid File");
-                            asciiCanvas.clearCanvas();
+                            ascii.getCanvas().clearCanvas();
                         }
                     }
                 });
@@ -120,9 +120,9 @@ public class TopPane extends GridPane {
         convertB.setOnAction((event) -> { // Convert Button Logic
             if (charField.getValue() != 0) {
                 if (pixels.size() > 0) {
-                    asciiCanvas.drawAscii(png.height(), png.width());
-                    imageCanvas.setVisibleWithPos(false);
-                    asciiPane.setVisibleWithPos(true);
+                    ascii.getCanvas().drawAscii(png.height(), png.width());
+                    imageCanvas.setVisibleWithTransform(false);
+                    ascii.setVisibleWithTransform(true);
                     errorLabel.setText("");
                 }
             } else {
@@ -134,8 +134,8 @@ public class TopPane extends GridPane {
             }
         });
         flipB.setOnAction((event) -> { // Switch Button Logic
-            asciiPane.setVisibleWithPos(!asciiPane.isVisible());
-            imageCanvas.setVisibleWithPos(!imageCanvas.isVisible());
+            ascii.setVisibleWithTransform(!ascii.isVisible());
+            imageCanvas.setVisibleWithTransform(!imageCanvas.isVisible());
         });
         exportB.setOnAction((event) -> { // Export Button Logic
             switch(exportChoices.getSelectionModel().getSelectedItem()) {
@@ -145,7 +145,7 @@ public class TopPane extends GridPane {
             }
         });
 
-        centerPane.getChildren().addAll(imageCanvas, asciiPane);
+        centerPane.getChildren().addAll(imageCanvas, ascii); // Add Canvases
         add(selectB, 0, 0); // Add GUI Elements
         add(convertB, 1, 0);
         add(invertLabel, 2, 0);
@@ -160,14 +160,14 @@ public class TopPane extends GridPane {
     }
 
     private void exportTextFile() {
-        List<String> ascii = asciiCanvas.getImageCharacters();
-        if (ascii.size() > 0) {
+        List<String> asciiChars = ascii.getCanvas().getImageCharacters();
+        if (asciiChars.size() > 0) {
             chooser.getExtensionFilters().set(0, new ExtensionFilter("Text File", "*.txt"));
             chooser.setTitle("Save File");
             File file = chooser.showSaveDialog(stage);
             if (file == null) return;
             DumpFile dFile = new DumpFile(file);
-            for (String s : ascii) {
+            for (String s : asciiChars) {
                 dFile.write(s);
             }
             dFile.close();
@@ -177,9 +177,9 @@ public class TopPane extends GridPane {
     }
 
     private void exportImageFile() {
-        if (asciiCanvas.getWidth() > 0 && asciiCanvas.getHeight() > 0) {
-            WritableImage wImg = new WritableImage( (int) asciiCanvas.getWidth(), (int) asciiCanvas.getHeight());
-            wImg = asciiCanvas.snapshot(new SnapshotParameters(), wImg);
+        if (ascii.getWidth() > 0 && ascii.getHeight() > 0) {
+            WritableImage wImg = new WritableImage( (int) ascii.getWidth(), (int) ascii.getHeight());
+            wImg = ascii.snapshot(new SnapshotParameters(), wImg);
             chooser.getExtensionFilters().set(0, pngFilter);
             chooser.setTitle("Save File");
             File file = chooser.showSaveDialog(stage);

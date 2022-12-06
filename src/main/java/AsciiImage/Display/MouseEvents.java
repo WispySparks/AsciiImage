@@ -1,31 +1,42 @@
 package AsciiImage.Display;
 
+import AsciiImage.Util.TranslateScale;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Translate;
 
 public class MouseEvents {
 
     public static final double scrollMultiplier = 0.03125;
 
-    public static void zoom(ScrollEvent event, Node node) {
+    public static TranslateScale zoom(ScrollEvent event, Node node) {
         double scale = (event.getDeltaY() >= 0) ? 1.2 : 0.8;
         double x = event.getX();
         double y = event.getY();
 
         Point2D p0 = node.localToScene(x, y);
 
-        node.setScaleX(node.getScaleX() * scale);
-        node.setScaleY(node.getScaleY() * scale);
+        double scaleX = node.getScaleX() * scale;
+        double scaleY = node.getScaleY() * scale;
+
+        node.setScaleX(scaleX);
+        node.setScaleY(scaleY);
 
         Point2D p1 = node.localToScene(x, y);
 
         double deltaX = p1.getX() - p0.getX();
         double deltaY = p1.getY() - p0.getY();
 
-        node.setTranslateX(node.getTranslateX() - deltaX);
-        node.setTranslateY(node.getTranslateY() - deltaY);   
+        double posX = node.getTranslateX() - deltaX;
+        double posY = node.getTranslateY() - deltaY;
+
+        node.setTranslateX(posX);
+        node.setTranslateY(posY);
+        
+        return new TranslateScale(new Translate(posX, posY), new Scale(scaleX, scaleY));
     }
 
     public static Point2D pan(MouseEvent event, Node node, Point2D startPoint) { 

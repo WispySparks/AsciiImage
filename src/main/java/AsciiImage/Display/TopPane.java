@@ -88,7 +88,7 @@ public class TopPane extends GridPane {
             if ((file = chooser.showOpenDialog(stage)) != null) {
                 Thread t = new Thread(new Task<Void>() {
                     @Override
-                    protected Void call() throws Exception {
+                    protected Void call() throws IOException {
                         png = decoder.readPNG(file);
                         if (!FileUtil.getFileExtension(file).equals("png")) throw new IOException("Invalid File");
                         if (png.isCorrupted()) throw new IOException("Corrupted");
@@ -110,7 +110,7 @@ public class TopPane extends GridPane {
                         } else if (exceptionProperty().get().getMessage().equals("Invalid File")) {
                             errorLabel.setText("Invalid File");
                             ascii.getCanvas().clearCanvas();
-                        }
+                        } 
                     }
                 });
                 t.setDaemon(true);

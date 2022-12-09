@@ -40,7 +40,8 @@ public class AsciiCanvas extends Canvas {
         List<Pixel> pixels = pixelSupplier.get();
         for (int i = 0; i < pixels.size(); i++) {
             Pixel p = pixels.get(i);
-            int gray = Math.round((p.red() + p.green() + p.blue()) / 3);
+            // int gray = Math.round((p.red() + p.green() + p.blue()) / 3);
+            int gray = lumaToGray(findLuma(p.red(), p.green(), p.blue()));
             Color c = Color.grayRgb(gray);
             if (p.X() % size == 0 && p.Y() % size == 0) {
                 String character = String.valueOf(chars[(int) Math.round((double) (c.getRed()*255)*((chars.length-1)/255.0))]);
@@ -51,6 +52,22 @@ public class AsciiCanvas extends Canvas {
                 }
             }
         }
+    }
+
+    private double findLuma(int red, int green, int blue) {
+        double sRed = (double) red/255;
+        double sGreen = (double) green/255;
+        double sBlue = (double) blue/255;
+        // double linearRed = Math.pow(sRed, 2.2);
+        // double linearGreen = Math.pow(sGreen, 2.2);
+        // double linearBlue = Math.pow(sBlue, 2.2);
+        double luma = (0.2126*sRed + 0.7152*sGreen + 0.0722*sBlue);
+        return luma;
+    }
+
+    private int lumaToGray(double luminance) {
+        double l = luminance*255;
+        return (int) Math.round(l);
     }
 
     public List<String> getImageCharacters() {

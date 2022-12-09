@@ -22,16 +22,18 @@ public class PNGReader {
             case PALETTE -> 1; // Indexed Color
             case RGB -> 3; // R, G, B
             case RGB_ALPHA -> 4; // R, G, B, A
+            default -> throw new IllegalArgumentException("Invalid Colortype");
         };
         lineLength = bytesPerPixel * png.width() + 1; // add one for the first byte that tells you the filter
     }
 
     /** 
+     * Read a PNG's data and create a 2D list of pixels for the image by decoding filters<p>
      * x the byte being filtered;
      * a the byte corresponding to x in the pixel immediately before the pixel containing x;
      * b the byte corresponding to x in the previous scanline;
-     * c the byte corresponding to b in the pixel immediately before the pixel containing b.
-     * c, b,
+     * c the byte corresponding to b in the pixel immediately before the pixel containing b. <p>
+     * c, b, <p>
      * a, x
      * @param image the image to parse into a list of pixels
      * @return pixels of the image
@@ -46,81 +48,88 @@ public class PNGReader {
             case PALETTE -> 1;
             case RGB -> 3;
             case RGB_ALPHA -> 4;
+            default -> throw new IllegalArgumentException("Invalid Colortype");
         };
         for (int i = 0; i < data.length; i += lineLength) { // go through every scan line's first byte to see the filter
             int currentLine = i/lineLength;
             for (int j = 0; j<png.width(); j++) { // go through each byte in that line to form the pixels
-                int xR = PNGUtil.toUInt8(data[multiplier*j+i+1]); // Find pixel/byte x
+                // Pixel X
+                int xR = PNGUtil.toUInt8(data[multiplier*j+i+1]);
                 int xG = PNGUtil.toUInt8(data[multiplier*j+i+2]);
                 int xB = PNGUtil.toUInt8(data[multiplier*j+i+3]);
                 int xA = 0;
                 if (png.colorType() == ColorType.GRAYSCALE_ALPHA || png.colorType() == ColorType.RGB_ALPHA) { // If alpha colortype grab alpha byte
                     xA = PNGUtil.toUInt8(data[multiplier*j+i+4]);
                 } 
+                // Pixel A
                 int aR = 0;
                 int aG = 0;
                 int aB = 0;
                 int aA = 0;
-
+                // Pixel B
                 int bR = 0;
                 int bG = 0;
                 int bB = 0;
                 int bA = 0;
-
+                // Pixel C
                 int cR = 0;
                 int cG = 0;
                 int cB = 0;
                 int cA = 0;
 
-                if (j > 0) { // Find pixel/byte a
-                    Pixel prevP = pixels.get(currentLine, j-1);
-                    aR = prevP.red();
-                    aG = prevP.green();
-                    aB = prevP.blue();
-                    aA = prevP.alpha();
+                if (j > 0) { // Find pixel A
+                    Pixel prevPixel = pixels.get(currentLine, j-1);
+                    aR = prevPixel.red();
+                    aG = prevPixel.green();
+                    aB = prevPixel.blue();
+                    aA = prevPixel.alpha();
                 }
-                if (i > 0) { // Find pixel/byte b
-                    Pixel aboveP = pixels.get(currentLine-1, j);
-                    bR = aboveP.red();
-                    bG = aboveP.green();
-                    bB = aboveP.blue();
-                    bA = aboveP.alpha();
+                if (i > 0) { // Find pixel B
+                    Pixel abovePixel = pixels.get(currentLine-1, j);
+                    bR = abovePixel.red();
+                    bG = abovePixel.green();
+                    bB = abovePixel.blue();
+                    bA = abovePixel.alpha();
                 }
-                if (i > 0 && j > 0) { // Find pixel/byte c
-                    Pixel diagonalP = pixels.get(currentLine-1, j-1);
-                    cR = diagonalP.red();
-                    cG = diagonalP.green();
-                    cB = diagonalP.blue();
-                    cA = diagonalP.alpha();
+                if (i > 0 && j > 0) { // Find pixel C
+                    Pixel diagonalPixel = pixels.get(currentLine-1, j-1);
+                    cR = diagonalPixel.red();
+                    cG = diagonalPixel.green();
+                    cB = diagonalPixel.blue();
+                    cA = diagonalPixel.alpha();
                 }
-                switch(data[i]) { // Create pixels differently based on filter
-                    case 0: // Filter Method 0 - None
-                        pixels.add(currentLine, createPixel(xR, xG, xB, xA, j, currentLine));
-                        break;
-                    case 1: // Filter Method 1 - Sub
-                        pixels.add(currentLine, createPixel((xR + aR)%256, (xG + aG)%256, (xB + aB)%256, (xA + aA)%256, j, currentLine));
-                        break;
-                    case 2: // Filter Method 2 - Up
-                        pixels.add(currentLine, createPixel((xR + bR)%256, (xG + bG)%256, (xB + bB)%256, (xA + bA)%256, j, currentLine));
-                        break;
-                    case 3: // Filter Method 3 - Average
-                        int R = (int) Math.floor((aR + bR)/2) + xR;
-                        int G = (int) Math.floor((aG + bG)/2) + xG;
-                        int B = (int) Math.floor((aB + bB)/2) + xB;
-                        int A = (int) Math.floor((aA + bA)/2) + xA;
-                        pixels.add(currentLine, createPixel(R%256, G%256, B%256, A%256, j, currentLine));
-                        break;
-                    case 4: // Filter Method 4 - Paeth
-                        int pR = PaethPredictor(aR, bR, cR) + xR;
-                        int pG = PaethPredictor(aG, bG, cG) + xG;
-                        int pB = PaethPredictor(aB, bB, cB) + xB;
-                        int pA = PaethPredictor(aA, bA, cA) + xA;
-                        pixels.add(currentLine, createPixel(pR%256, pG%256, pB%256, pA%256, j, currentLine));
-                        break;
-                }
+                int[] pixelX = {xR, xG, xB, xA};    
+                int[] pixelA = {aR, aG, aB, aA};
+                int[] pixelB = {bR, bG, bB, bA};
+                int[] pixelC = {cR, cG, cB, cA};
+                pixels.add(currentLine, decodeFilter(data[i], pixelX, pixelA, pixelB, pixelC, j, currentLine));                
             }
         }
         return pixels;
+    }
+
+    private Pixel decodeFilter(int filter, int[] pixelX, int[] pixelA, int[] pixelB, int[] pixelC, int x, int y) {
+        switch(filter) { // create pixels differently based on filter
+            case 0: // Filter Method 0 - None
+                return createPixel(pixelX[0], pixelX[1], pixelX[2], pixelX[3], x, y);
+            case 1: // Filter Method 1 - Sub
+                return createPixel((pixelX[0] + pixelA[0])%256, (pixelX[1] + pixelA[1])%256, (pixelX[2] + pixelA[2])%256, (pixelX[3] + pixelA[3])%256, x, y);
+            case 2: // Filter Method 2 - Up
+                return createPixel((pixelX[0] + pixelB[0])%256, (pixelX[1] + pixelB[1])%256, (pixelX[2] + pixelB[2])%256, (pixelX[3] + pixelB[3])%256, x, y);
+            case 3: // Filter Method 3 - Average
+                int R = (int) Math.floor((pixelA[0] + pixelB[0])/2) + pixelX[0];
+                int G = (int) Math.floor((pixelA[1] + pixelB[1])/2) + pixelX[1];
+                int B = (int) Math.floor((pixelA[2] + pixelB[2])/2) + pixelX[2];
+                int A = (int) Math.floor((pixelA[3] + pixelB[3])/2) + pixelX[3];
+                return createPixel(R%256, G%256, B%256, A%256, x, y);
+            case 4: // Filter Method 4 - Paeth
+                int pR = PaethPredictor(pixelA[0], pixelB[0], pixelC[0]) + pixelX[0];
+                int pG = PaethPredictor(pixelA[1], pixelB[1], pixelC[1]) + pixelX[1];
+                int pB = PaethPredictor(pixelA[2], pixelB[2], pixelC[2]) + pixelX[2];
+                int pA = PaethPredictor(pixelA[3], pixelB[3], pixelC[3]) + pixelX[3];
+                return createPixel(pR%256, pG%256, pB%256, pA%256, x, y);
+            default: throw new IllegalArgumentException("Filter byte doesn't match a filter");
+        }
     }
 
     /**
@@ -158,6 +167,7 @@ public class PNGReader {
             case PALETTE -> new Pixel(0, 255, 0, 0, 0, indexedColor, x, y);
             case RGB -> new Pixel(red, green, blue, x, y);
             case RGB_ALPHA -> new Pixel(red, green, blue, alpha, x, y);
+            default -> throw new IllegalArgumentException("Invalid Colortype");
         };
     }
 }

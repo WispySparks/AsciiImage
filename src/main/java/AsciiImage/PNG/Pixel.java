@@ -29,4 +29,8 @@ public record Pixel(
         this(0, A, R, G, B, 0, X, Y);
     }
 
+    Pixel() {
+        this(0, 0, 0, 0, 0, 0, 0, 0);
+    }
+
 }

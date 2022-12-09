@@ -9,6 +9,7 @@ public class PNGReader {
     private PNG png;
     private byte[] data;
     private int lineLength; // amount of bytes in one scanline of the image
+    private int multiplier; // how many bytes each one pixel is
 
     /**
      * Grab byte data from png and figure out the lineLength of the png
@@ -25,6 +26,14 @@ public class PNGReader {
             default -> throw new IllegalArgumentException("Invalid Colortype");
         };
         lineLength = bytesPerPixel * png.width() + 1; // add one for the first byte that tells you the filter
+        multiplier = switch (png.colorType()) {
+            case GRAYSCALE -> 1;
+            case GRAYSCALE_ALPHA -> 2;
+            case PALETTE -> 1;
+            case RGB -> 3;
+            case RGB_ALPHA -> 4;
+            default -> throw new IllegalArgumentException("Invalid Colortype");
+        };
     }
 
     /** 
@@ -40,16 +49,8 @@ public class PNGReader {
      * @link https://www.w3.org/TR/2003/REC-PNG-20031110/#9Filter-types
      */
     public ArrayList2D<Pixel> parseImageData(PNG image) {
-        setup(image);
         ArrayList2D<Pixel> pixels = new ArrayList2D<>();
-        int multiplier = switch (png.colorType()) {
-            case GRAYSCALE -> 1;
-            case GRAYSCALE_ALPHA -> 2;
-            case PALETTE -> 1;
-            case RGB -> 3;
-            case RGB_ALPHA -> 4;
-            default -> throw new IllegalArgumentException("Invalid Colortype");
-        };
+        setup(image);
         for (int i = 0; i < data.length; i += lineLength) { // go through every scan line's first byte to see the filter
             int currentLine = i/lineLength;
             for (int j = 0; j<png.width(); j++) { // go through each byte in that line to form the pixels
@@ -98,10 +99,10 @@ public class PNGReader {
                     cB = diagonalPixel.blue();
                     cA = diagonalPixel.alpha();
                 }
-                int[] pixelX = {xR, xG, xB, xA};    
-                int[] pixelA = {aR, aG, aB, aA};
-                int[] pixelB = {bR, bG, bB, bA};
-                int[] pixelC = {cR, cG, cB, cA};
+                int[] pixelX = {xR, xG, xB, xA}; // RGBA values of pixel X
+                int[] pixelA = {aR, aG, aB, aA}; // RGBA values of pixel A
+                int[] pixelB = {bR, bG, bB, bA}; // RGBA values of pixel B
+                int[] pixelC = {cR, cG, cB, cA}; // RGBA values of pixel C
                 pixels.add(currentLine, decodeFilter(data[i], pixelX, pixelA, pixelB, pixelC, j, currentLine));                
             }
         }

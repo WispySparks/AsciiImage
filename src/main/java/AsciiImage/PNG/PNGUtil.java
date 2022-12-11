@@ -1,4 +1,4 @@
-package AsciiImage.Util;
+package AsciiImage.PNG;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

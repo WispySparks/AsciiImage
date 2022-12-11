@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import AsciiImage.PNG.Pixel;
-import AsciiImage.Util.TranslateScale;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.PixelWriter;
@@ -17,16 +16,16 @@ public class ImageCanvas extends Canvas {
     private PixelWriter pw = getGraphicsContext2D().getPixelWriter();
     private Supplier<List<Pixel>> pixels;
     private Point2D clickPoint;
-    private TranslateScale transform;
+    private SimpleTransform transform;
 
-    public ImageCanvas(Supplier<List<Pixel>> supplier, TranslateScale ts) {
+    public ImageCanvas(Supplier<List<Pixel>> supplier, SimpleTransform ts) {
         super();
         pixels = supplier;
         transform = ts;
         transform.setTranslate(new Translate(getTranslateX(), getTranslateY()));
         transform.setScale(new Scale(getScaleX(), getScaleY()));
         setOnScroll((event) -> {
-            TranslateScale t = MouseEvents.zoom(event, this);
+            SimpleTransform t = MouseEvents.zoom(event, this);
             transform.setScale(t.getScale());
             transform.setTranslate(t.getTranslate());
         });

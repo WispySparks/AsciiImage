@@ -1,11 +1,6 @@
 package AsciiImage;
 
-import java.io.File;
-
 import AsciiImage.Display.TopPane;
-import AsciiImage.PNG.PNG;
-import AsciiImage.PNG.PNGDecoder;
-import AsciiImage.PNG.PNGReader;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -16,14 +11,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class Main extends Application { // todo 2nd line of pixels has incorrect Y value with PNGReader, gray color, spazzing thing when panning
+public class Main extends Application { //todo gray color, spazzing thing when panning
     public static void main(String[] args) {
-        PNGReader reader = new PNGReader();
-        PNGDecoder decoder = new PNGDecoder();
-        PNG png = decoder.readPNG(new File("C:\\Users\\wispy\\Downloads\\square.png"));
-        System.out.println(reader.parseImageData(png).toSingleList());
-        throw new RuntimeException("stop");
-        // launch(args);
+        launch(args);
     }
 
     @Override

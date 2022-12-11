@@ -1,10 +1,10 @@
 package AsciiImage.Display;
 
-import AsciiImage.Util.TranslateScale;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 
@@ -12,7 +12,7 @@ public class MouseEvents {
 
     public static final double scrollMultiplier = 0.03125;
 
-    public static TranslateScale zoom(ScrollEvent event, Node node) {
+    public static SimpleTransform zoom(ScrollEvent event, Node node) {
         double scale = (event.getDeltaY() >= 0) ? 1.2 : 0.8;
         double x = event.getX();
         double y = event.getY();
@@ -36,7 +36,7 @@ public class MouseEvents {
         node.setTranslateX(posX);
         node.setTranslateY(posY);
         
-        return new TranslateScale(new Translate(posX, posY), new Scale(scaleX, scaleY));
+        return new SimpleTransform(new Translate(posX, posY), new Scale(scaleX, scaleY), new Rotate());
     }
 
     public static Point2D pan(MouseEvent event, Node node, Point2D startPoint) { 

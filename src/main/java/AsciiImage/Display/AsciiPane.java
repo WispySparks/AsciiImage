@@ -6,7 +6,6 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import AsciiImage.PNG.Pixel;
-import AsciiImage.Util.TranslateScale;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 import javafx.scene.transform.Translate;
@@ -14,17 +13,17 @@ import javafx.scene.transform.Translate;
 public class AsciiPane extends Pane {
 
     private Point2D clickPoint;
-    private TranslateScale transform;
+    private SimpleTransform transform;
     private AsciiCanvas canvas;
     
-    public AsciiPane(Supplier<List<Pixel>> supplier, BooleanSupplier inv, IntSupplier size, TranslateScale ts) {
+    public AsciiPane(Supplier<List<Pixel>> supplier, BooleanSupplier inv, IntSupplier size, SimpleTransform ts) {
         super();
         canvas = new AsciiCanvas(supplier, inv, size);
         getChildren().add(canvas);
         transform = ts;
         setStyle("-fx-background-color: white");
         setOnScroll((event) -> {
-            TranslateScale t = MouseEvents.zoom(event, this);
+            SimpleTransform t = MouseEvents.zoom(event, this);
             transform.setScale(t.getScale());
             transform.setTranslate(t.getTranslate());
         });

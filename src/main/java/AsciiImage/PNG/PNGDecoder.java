@@ -14,7 +14,6 @@ import AsciiImage.PNG.PNG.Chromaticities;
 import AsciiImage.PNG.PNG.ColorType;
 import AsciiImage.PNG.PNG.PixelDimensions;
 import AsciiImage.Util.AsciiTable;
-import AsciiImage.Util.PNGUtil;
 
 public class PNGDecoder { 
 
@@ -193,20 +192,6 @@ public class PNGDecoder {
             for (int i = 0; i < length-profileName.length()-2; i++) {
                 iccProfile.add(stream.readByte());
             }
-        }
-    }
-    @SuppressWarnings("unused")
-    private void readsBIT(FileImageInputStream stream) throws IOException {
-        switch(colorType) {
-            case GRAYSCALE:
-                break;
-            case RGB:
-            case PALETTE:
-                break;
-            case GRAYSCALE_ALPHA:
-                break;
-            case RGB_ALPHA:
-                break;
         }
     }
 

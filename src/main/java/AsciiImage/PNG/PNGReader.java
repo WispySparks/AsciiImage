@@ -2,7 +2,6 @@ package AsciiImage.PNG;
 
 import AsciiImage.PNG.PNG.ColorType;
 import AsciiImage.Util.ArrayList2D;
-import AsciiImage.Util.PNGUtil;
 
 public class PNGReader {
     

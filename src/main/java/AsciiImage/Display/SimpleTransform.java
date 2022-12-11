@@ -1,20 +1,23 @@
-package AsciiImage.Util;
+package AsciiImage.Display;
 
+import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 
-public class TranslateScale {
+public class SimpleTransform {
     
     private Translate translate;
     private Scale scale;
+    private Rotate rotate;
 
-    public TranslateScale() {
-        this(new Translate(0, 0), new Scale(0, 0));
+    public SimpleTransform() {
+        this(new Translate(0, 0), new Scale(0, 0), new Rotate(0));
     }
 
-    public TranslateScale(Translate translate, Scale scale) {
+    public SimpleTransform(Translate translate, Scale scale, Rotate rotate) {
         this.translate = translate;
         this.scale = scale;
+        this.rotate = rotate;
     }
 
     public Translate getTranslate() {
@@ -41,9 +44,22 @@ public class TranslateScale {
         scale = new Scale(1, 1);
     }
 
+    public Rotate getRotate() {
+        return rotate;
+    }
+
+    public void setRotate(Rotate rotate) {
+        this.rotate = rotate;
+    }
+
+    public void resetRotate() {
+        rotate = new Rotate(0);
+    }
+
     public void reset() {
         resetTranslate();
         resetScale();
+        resetRotate();
     }
     
 }

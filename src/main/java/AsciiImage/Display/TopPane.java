@@ -14,7 +14,6 @@ import AsciiImage.PNG.PNGReader;
 import AsciiImage.PNG.Pixel;
 import AsciiImage.Util.DumpFile;
 import AsciiImage.Util.FileUtil;
-import AsciiImage.Util.TranslateScale;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
@@ -75,7 +74,7 @@ public class TopPane extends GridPane {
         exportChoices.getItems().addAll("Text File", "Image");
         exportChoices.getSelectionModel().selectFirst();
 
-        TranslateScale tranform = new TranslateScale();
+        SimpleTransform tranform = new SimpleTransform();
         ImageCanvas imageCanvas = new ImageCanvas(() -> pixels, tranform);
         imageCanvas.setVisibleWithTransform(false);
         ascii = new AsciiPane(() -> pixels, () -> invertCB.isSelected(), () -> charField.getValue(), tranform);

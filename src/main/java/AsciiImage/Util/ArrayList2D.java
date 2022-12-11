@@ -116,14 +116,11 @@ public class ArrayList2D<T> {
      * @return list
      */
     public List<T> toSingleList() {
-        if (list2D.size() > 0) {
-            List<T> fList = list2D.get(0);
-            for (List<T> l : list2D) {
-                fList.addAll(l);
-            }
-            return fList;
+        List<T> list = new ArrayList<>();
+        for (List<T> l : list2D) {
+            list.addAll(l);
         }
-        return new ArrayList<>();
+        return list;
     }
 
     /**

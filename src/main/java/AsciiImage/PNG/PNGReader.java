@@ -9,32 +9,7 @@ public class PNGReader {
     private PNG png;
     private byte[] data;
     private int lineLength; // amount of bytes in one scanline of the image
-    private int multiplier; // how many bytes each one pixel is
-
-    /**
-     * Grab byte data from png and figure out the lineLength of the png
-     */
-    private void setup(PNG image) {
-        this.png = image;
-        data = png.imageData();
-        int bytesPerPixel = switch(png.colorType()) {
-            case GRAYSCALE -> 1; // G
-            case GRAYSCALE_ALPHA -> 2; // G, A
-            case PALETTE -> 1; // Indexed Color
-            case RGB -> 3; // R, G, B
-            case RGB_ALPHA -> 4; // R, G, B, A
-            default -> throw new IllegalArgumentException("Invalid Colortype");
-        };
-        lineLength = bytesPerPixel * png.width() + 1; // add one for the first byte that tells you the filter
-        multiplier = switch (png.colorType()) {
-            case GRAYSCALE -> 1;
-            case GRAYSCALE_ALPHA -> 2;
-            case PALETTE -> 1;
-            case RGB -> 3;
-            case RGB_ALPHA -> 4;
-            default -> throw new IllegalArgumentException("Invalid Colortype");
-        };
-    }
+    private int bytesPerPixel; // how many bytes each one pixel is
 
     /** 
      * Read a PNG's data and create a 2D list of pixels for the image by decoding filters<p>
@@ -51,62 +26,85 @@ public class PNGReader {
     public ArrayList2D<Pixel> parseImageData(PNG image) {
         ArrayList2D<Pixel> pixels = new ArrayList2D<>();
         setup(image);
-        for (int i = 0; i < data.length; i += lineLength) { // go through every scan line's first byte to see the filter
+        for (int i = 0; i < data.length; i += lineLength) { // go through every scan line
             int currentLine = i/lineLength;
             for (int j = 0; j<png.width(); j++) { // go through each byte in that line to form the pixels
                 // Pixel X
-                int xR = PNGUtil.toUInt8(data[multiplier*j+i+1]);
-                int xG = PNGUtil.toUInt8(data[multiplier*j+i+2]);
-                int xB = PNGUtil.toUInt8(data[multiplier*j+i+3]);
-                int xA = 0;
-                if (png.colorType() == ColorType.GRAYSCALE_ALPHA || png.colorType() == ColorType.RGB_ALPHA) { // If alpha colortype grab alpha byte
-                    xA = PNGUtil.toUInt8(data[multiplier*j+i+4]);
+                int xRed = PNGUtil.toUInt8(data[bytesPerPixel*j+i+1]);
+                int xGreen = 0;
+                if (png.colorType() != ColorType.GRAYSCALE && png.colorType() != ColorType.PALETTE) { // can only grab green if not grayscale or palette
+                    xGreen = PNGUtil.toUInt8(data[bytesPerPixel*j+i+2]);
+                }
+                int xBlue = 0;
+                if (png.colorType() == ColorType.RGB || png.colorType() == ColorType.RGB_ALPHA) { // if rgb or rgba grab blue
+                    xBlue = PNGUtil.toUInt8(data[bytesPerPixel*j+i+3]);
+                }
+                int xAlpha = 0;
+                if (png.colorType() == ColorType.RGB_ALPHA) { // if rgba grab alpha 
+                    xAlpha = PNGUtil.toUInt8(data[bytesPerPixel*j+i+4]);
                 } 
                 // Pixel A
-                int aR = 0;
-                int aG = 0;
-                int aB = 0;
-                int aA = 0;
+                int aRed = 0;
+                int aGreen = 0;
+                int aBlue = 0;
+                int aAlpha = 0;
                 // Pixel B
-                int bR = 0;
-                int bG = 0;
-                int bB = 0;
-                int bA = 0;
+                int bRed = 0;
+                int bGreen = 0;
+                int bBlue = 0;
+                int bAlpha = 0;
                 // Pixel C
-                int cR = 0;
-                int cG = 0;
-                int cB = 0;
-                int cA = 0;
+                int cRed = 0;
+                int cGreen = 0;
+                int cBlue = 0;
+                int cAlpha = 0;
 
                 if (j > 0) { // Find pixel A
                     Pixel prevPixel = pixels.get(currentLine, j-1);
-                    aR = prevPixel.red();
-                    aG = prevPixel.green();
-                    aB = prevPixel.blue();
-                    aA = prevPixel.alpha();
+                    aRed = prevPixel.red();
+                    aGreen = prevPixel.green();
+                    aBlue = prevPixel.blue();
+                    aAlpha = prevPixel.alpha();
                 }
                 if (i > 0) { // Find pixel B
                     Pixel abovePixel = pixels.get(currentLine-1, j);
-                    bR = abovePixel.red();
-                    bG = abovePixel.green();
-                    bB = abovePixel.blue();
-                    bA = abovePixel.alpha();
+                    bRed = abovePixel.red();
+                    bGreen = abovePixel.green();
+                    bBlue = abovePixel.blue();
+                    bAlpha = abovePixel.alpha();
                 }
                 if (i > 0 && j > 0) { // Find pixel C
                     Pixel diagonalPixel = pixels.get(currentLine-1, j-1);
-                    cR = diagonalPixel.red();
-                    cG = diagonalPixel.green();
-                    cB = diagonalPixel.blue();
-                    cA = diagonalPixel.alpha();
+                    cRed = diagonalPixel.red();
+                    cGreen = diagonalPixel.green();
+                    cBlue = diagonalPixel.blue();
+                    cAlpha = diagonalPixel.alpha();
                 }
-                int[] pixelX = {xR, xG, xB, xA}; // RGBA values of pixel X
-                int[] pixelA = {aR, aG, aB, aA}; // RGBA values of pixel A
-                int[] pixelB = {bR, bG, bB, bA}; // RGBA values of pixel B
-                int[] pixelC = {cR, cG, cB, cA}; // RGBA values of pixel C
+                int[] pixelX = {xRed, xGreen, xBlue, xAlpha}; // RGBA values of pixel X
+                int[] pixelA = {aRed, aGreen, aBlue, aAlpha}; // RGBA values of pixel A
+                int[] pixelB = {bRed, bGreen, bBlue, bAlpha}; // RGBA values of pixel B
+                int[] pixelC = {cRed, cGreen, cBlue, cAlpha}; // RGBA values of pixel C
                 pixels.add(currentLine, decodeFilter(data[i], pixelX, pixelA, pixelB, pixelC, j, currentLine));                
             }
         }
         return pixels;
+    }
+
+    /**
+     * Grab byte data from png and figure out the lineLength of the png
+     */
+    private void setup(PNG image) {
+        this.png = image;
+        data = png.imageData();
+        bytesPerPixel = switch(png.colorType()) {
+            case GRAYSCALE -> 1; // G
+            case GRAYSCALE_ALPHA -> 2; // G, A
+            case PALETTE -> 1; // Indexed Color
+            case RGB -> 3; // R, G, B
+            case RGB_ALPHA -> 4; // R, G, B, A
+            default -> throw new IllegalArgumentException("Invalid Colortype");
+        };
+        lineLength = bytesPerPixel * png.width() + 1; // add one for the first byte that tells you the filter
     }
 
     private Pixel decodeFilter(int filter, int[] pixelX, int[] pixelA, int[] pixelB, int[] pixelC, int x, int y) {
@@ -159,7 +157,7 @@ public class PNGReader {
     }
 
     private Pixel createPixel(int red, int green, int blue, int alpha, int x, int y) {
-        int indexedColor = red;
+        int indexedColor = red; // they represent different things based on the colortype/multiplier
         int gray = red;
         int grayAlpha = green;
         return switch(png.colorType()) {

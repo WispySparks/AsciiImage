@@ -69,6 +69,8 @@ public final class PNGUtil {
         }
         return decompressedData;
     }
+
+    /*
     
     // * https://www.w3.org/TR/2003/REC-PNG-20031110/#D-CRCAppendix
 
@@ -95,7 +97,8 @@ public final class PNGUtil {
     /* Update a running CRC with the bytes buf[0..len-1]--the CRC
       should be initialized to all 1's, and the transmitted value
       is the 1's complement of the final running CRC (see the
-      crc() routine below). */
+      crc() routine below). */ 
+    /*
     private static long updateCRC(long crc, byte[] buf, int len) {
         long c = crc;
         int n;
@@ -109,5 +112,7 @@ public final class PNGUtil {
     public static long crc(byte[] buf) {
         return updateCRC(0xffffffffL, buf, buf.length) ^ 0xffffffffL;
     }
+
+    */
 
 }

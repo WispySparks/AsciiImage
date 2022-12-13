@@ -8,12 +8,12 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import AsciiImage.File.DumpFile;
+import AsciiImage.File.FileUtil;
 import AsciiImage.PNG.PNG;
 import AsciiImage.PNG.PNGDecoder;
 import AsciiImage.PNG.PNGReader;
 import AsciiImage.PNG.Pixel;
-import AsciiImage.Util.DumpFile;
-import AsciiImage.Util.FileUtil;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;

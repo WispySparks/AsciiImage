@@ -11,7 +11,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class Main extends Application { //todo gray color, spazzing thing when panning
+public class Main extends Application { //todo spazzing thing when panning
     public static void main(String[] args) {
         launch(args);
     }

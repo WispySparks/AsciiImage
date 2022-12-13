@@ -13,7 +13,6 @@ import javax.imageio.stream.FileImageInputStream;
 import AsciiImage.PNG.PNG.Chromaticities;
 import AsciiImage.PNG.PNG.ColorType;
 import AsciiImage.PNG.PNG.PixelDimensions;
-import AsciiImage.Util.AsciiTable;
 
 public class PNGDecoder { 
 

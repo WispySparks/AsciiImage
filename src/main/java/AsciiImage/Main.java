@@ -23,7 +23,7 @@ public class Main extends Application { //todo spazzing thing when panning
         Scene scene = new Scene(new BorderPane(centerPane, new TopPane(stage, centerPane), null, null, null), 640, 480);
         stage.setScene(scene);
         stage.setTitle("PNG to ASCII");
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("../AsciiIcon.png")));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/AsciiIcon.png")));
         stage.setMaximized(true);
         stage.show();
     }

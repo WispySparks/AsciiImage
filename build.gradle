@@ -30,8 +30,10 @@ application {
 
 jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    imageName = 'AsciiImage'
     launcher{
-        name = 'app'
+        name = 'AsciiImage'
+        noConsole = true
     }
 }
 

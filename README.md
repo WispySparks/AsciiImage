@@ -9,6 +9,4 @@ The ```Switch``` button is used to switch between the original image and the asc
 ### Before
 ![](images/celeste.png)
 ### After
-[![](images/ascii.png)](images/ascii.png)
-
-You can click on the ascii image because it looks better once you zoom in.
+![](images/ascii.png)

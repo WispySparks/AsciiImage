@@ -24,12 +24,16 @@ jobs:
       run: echo $JAVA_HOME
     - name: Gradle Wrapper Validation
       uses: gradle/wrapper-validation-action@v1
-    - name: Setup Gradle
+    - name: Execute Build
       uses: gradle/gradle-build-action@v2.3.3
       with:
         gradle-version: wrapper
+        arguments: build
     - name: Execute jlinkZip
-      run: sudo ./gradlew --info --stacktrace jlinkZip
+      uses: gradle/gradle-build-action@v2.3.3
+      with:
+        gradle-version: wrapper
+        arguments: jlinkZip
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.1
       with:

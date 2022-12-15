@@ -25,9 +25,9 @@ jobs:
     - name: Gradle Wrapper Validation
       uses: gradle/wrapper-validation-action@v1
     - name: Execute build
-      run: ./gradlew --info --stacktrace build
+      run: sudo ./gradlew --info --stacktrace build
     - name: Execute jlinkZip
-      run: ./gradlew --info --stacktrace jlinkZip
+      run: sudo ./gradlew --info --stacktrace jlinkZip
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.1
       with:

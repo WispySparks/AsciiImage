@@ -177,8 +177,14 @@ public class TopPane extends GridPane {
 
     private void exportImageFile() {
         if (ascii.getWidth() > 0 && ascii.getHeight() > 0) {
+            double sx = ascii.getScaleX();
+            double sy = ascii.getScaleY();
+            ascii.setScaleX(1);
+            ascii.setScaleY(1);
             WritableImage wImg = new WritableImage( (int) ascii.getWidth(), (int) ascii.getHeight());
             wImg = ascii.snapshot(new SnapshotParameters(), wImg);
+            ascii.setScaleX(sx);
+            ascii.setScaleY(sy);
             chooser.getExtensionFilters().set(0, pngFilter);
             chooser.setTitle("Save File");
             File file = chooser.showSaveDialog(stage);

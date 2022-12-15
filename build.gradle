@@ -50,9 +50,14 @@ jlink {
 tasks.jlink.doLast {
     delete("${buildDir}\\AsciiImage\\release")
     copy {
-        from ("${buildDir}\\AsciiImage\\bin\\Launch")
-        from ("${buildDir}\\AsciiImage\\bin\\Launch.bat")
-        into ("${buildDir}\\AsciiImage")
+        from("${buildDir}\\AsciiImage\\bin\\Launch")
+        into("${buildDir}\\AsciiImage")
+        rename('Launch', 'Launch.sh')
+        
+    }
+    copy {
+        from("${buildDir}\\AsciiImage\\bin\\Launch.bat")
+        into("${buildDir}\\AsciiImage")
     }
     delete("${buildDir}\\AsciiImage\\bin\\Launch")
     delete("${buildDir}\\AsciiImage\\bin\\Launch.bat")

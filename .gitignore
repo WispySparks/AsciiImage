@@ -10,6 +10,4 @@ build
 .vscode
 bin
 
-# Testing
-*.txt
 !LICENSE.txt

@@ -40,8 +40,8 @@ public class MouseEvents {
     }
 
     public static Point2D pan(MouseEvent event, Node node, Point2D startPoint) { 
-        double x = node.getTranslateX() + event.getX() - startPoint.getX();
-        double y = node.getTranslateY() + event.getY() - startPoint.getY();
+        double x = node.getTranslateX() + ((event.getX() - startPoint.getX()) * node.getScaleX());
+        double y = node.getTranslateY() + ((event.getY() - startPoint.getY()) * node.getScaleY());
         node.setTranslateX(x); 
         node.setTranslateY(y);
         return new Point2D(x, y);

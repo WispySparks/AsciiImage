@@ -6,7 +6,12 @@ You are able to pan and zoom around the photo as you would expect.
 
 The ```Switch``` button is used to switch between the original image and the ascii one so it will be blank if you switch before converting.
 
+The reason this project is special is I have created the PNG decoder/reader myself.
+
 ### Before
 ![](images/celeste.png)
 ### After
 ![](images/ascii.png)
+
+### Contributing
+If you come across any issues please file an issue or pull request that would be greatly appreciated.

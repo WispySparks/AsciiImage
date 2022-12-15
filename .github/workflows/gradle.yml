@@ -40,5 +40,5 @@ jobs:
       uses: actions/upload-artifact@v3.1.1
       with:
         name: ${{ matrix.os }}-${{ matrix.java }}-RuntimeImage
-        path: build/AsciiImage.zip
+        path: build/AsciiImage
         retention-days: 2

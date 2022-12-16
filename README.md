@@ -1,6 +1,6 @@
 # AsciiImage
 
-This is a program that will convert normal png files into their ascii counterparts. You can then export this into a text file or another png. To first run the application either use the shell or batch script at the top of the zip file. All you gotta do is select a png image and then specify the amount of pixels per character and click ```Convert```.
+This is a Java application made using JavaFX and Gradle that will convert normal png files into ascii versions. You can then export this into a text file or another png. To first run the application either use the shell or batch script at the top of the zip file. All you gotta do is select a png image and then specify the amount of pixels per character and click ```Convert```.
 
 You are able to pan and zoom around the photo as you would expect.
 

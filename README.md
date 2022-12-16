@@ -9,7 +9,7 @@ The ```Switch``` button is used to switch between the original image and the asc
 The reason this project is special is I have created the PNG decoder/reader myself. Also my github actions are dapper with it.
 
 If you're on a mac or linux you might have to chmod the shell script/java exe to run it I dunno how to fix that.
-
+## Images
 ### Gui
 ![](images/gui.png)
 ### Before
@@ -17,8 +17,8 @@ If you're on a mac or linux you might have to chmod the shell script/java exe to
 ### After
 ![](images/ascii.png)
 
-### Building from source
+## Building from source
 To build from source you first are going to want to `git clone` the repo. To run the project use `./gradlew run`. To build the project into an image use `./gradlew jlink` or `./gradlew jlinkZip` for a zip file. I wouldn't recommend trying to just use `./gradlew build` unless you have JavaFX installed and configured properly.
 
-### Contributing
+## Contributing
 If you come across any issues please file an issue or pull request that would be greatly appreciated.

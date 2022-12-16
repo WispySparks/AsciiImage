@@ -10,10 +10,15 @@ The reason this project is special is I have created the PNG decoder/reader myse
 
 If you're on a mac or linux you might have to chmod the shell script/java exe to run it I dunno how to fix that.
 
+### Gui
+![](images/gui.png)
 ### Before
 ![](images/celeste.png)
 ### After
 ![](images/ascii.png)
+
+### Building from source
+To build from source you first are going to want to `git clone` the repo. To run the project use `./gradlew run`. To build the project into an image use `./gradlew jlink` or `./gradlew jlinkZip` for a zip file. I wouldn't recommend trying to just use `./gradlew build` unless you have JavaFX installed and configured properly.
 
 ### Contributing
 If you come across any issues please file an issue or pull request that would be greatly appreciated.

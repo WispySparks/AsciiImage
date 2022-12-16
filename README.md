@@ -6,7 +6,7 @@ You are able to pan and zoom around the photo as you would expect.
 
 The ```Switch``` button is used to switch between the original image and the ascii one so it will be blank if you switch before converting.
 
-The reason this project is special is I have created the PNG decoder/reader myself.
+The reason this project is special is I have created the PNG decoder/reader myself. Also my github actions are dapper with it.
 
 If you're on a mac or linux you might have to chmod the shell script/java exe to run it I dunno how to fix that.
 

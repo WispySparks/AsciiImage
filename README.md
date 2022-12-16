@@ -8,6 +8,8 @@ The ```Switch``` button is used to switch between the original image and the asc
 
 The reason this project is special is I have created the PNG decoder/reader myself.
 
+If you're on a mac or linux you might have to chmod the shell script/java exe to run it I dunno how to fix that.
+
 ### Before
 ![](images/celeste.png)
 ### After
